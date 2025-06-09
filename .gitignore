@@ -1,0 +1,30 @@
+# IDEs and Editors
+.vscode/  # VS Code 관련 설정 (선택 사항, 팀원과 공유하는 경우 제거)
+.idea/    # IntelliJ IDEA 관련 설정
+*.sublime-project
+*.sublime-workspace
+
+# Node.js
+node_modules/
+dist/             # 빌드된 결과물이 들어가는 폴더 (Vue CLI의 기본 빌드 출력 폴더)
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.yarn-cache/
+
+# Environment variables
+.env
+.env.*
+!.env.production # 프로덕션 환경 변수는 예외로 관리하고 싶은 경우 (하지만 보통 .env 자체를 무시)
+
+# Mac
+.DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Other
+coverage/

@@ -35,5 +35,7 @@ body, #app {
 }
 .main-content {
   padding-top: 60px; /* NavBar 높이만큼 */
+  max-width: 1000px;
+  margin: 0 auto;
 }
 </style>

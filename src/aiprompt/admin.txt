@@ -1,0 +1,24 @@
+CREATE TABLE library (
+  idx SERIAL PRIMARY KEY, -- 고유한 ID, 기본 키로 설정
+  type VARCHAR(255), -- 타입
+  title VARCHAR(255), -- 제목
+  sub_desc TEXT, -- 부제목 설명
+  context TEXT, -- 내용
+  font_cdn VARCHAR(255), -- 폰트 CDN 주소
+  img VARCHAR(255), -- 이미지 URL
+  isFree BOOLEAN -- 무료 여부 (true 또는 false)
+);
+슈퍼베이스에 정의된 테이블의 구조는 이와 같다.
+
+admin페이지를 만들 것이다. 각 타입을 고려하여 만든다. boolean은 체크박스를 이용한다.
+이 페이지는 데이터 확인 및 추가, 제거, 수정 하는 페이지이다. 다음 요구사항을 준수하여 생성해라.
+
+1. html, css, js는 한 파일에 존재한다. js는 vue3문법을 사용한다.
+2. 슈퍼베이스는 cdn으로 가져온다.
+3. idx값은 serial로 설정되어 있기 때문에 insert시 idx값을 명시와 받아오지 않는다.
+4. 전체 목록이 출력되는 화면이 먼저 출력되며 우측 상단에 +버튼으로 추가, 각 데이터가 출력되는 부분의 우측에 수정, 삭제 버튼이 존재하여 클릭 시 각 기능들이 수행된다.
+5. 수정, 추가는 모달을 사용한다.
+6. 전체 데이터 출력은 상단에 type버튼별로 출력된다.
+7. 수정, 삭제에 사용되는 type은 select 태그로 각 데이터는 library, api, css, font, js, gsap을 기준으로 한다.
+
+위 요구사항에 맞춰 코드를 생성해라.

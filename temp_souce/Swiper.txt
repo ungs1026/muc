@@ -1,0 +1,109 @@
+# **Swiper**
+
+Swiper는 웹에서 가장 인기 있는 모바일 친화적인 슬라이더 라이브러리입니다. 성능, 유연성, 네이티브와 같은 터치 상호작용에 중점을 두고 제작된 이 슬라이더는 웹사이트, 앱, 디지털 제품 전반에 걸쳐 수백만 개의 슬라이더를 지원합니다.
+
+## Install from NPM (**CLI**)
+```
+npm install swiper
+```
+---
+## **CDN**
+```
+// Swiper CSS
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+// Swiper JS
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+```
+---
+## CLI로 사용할 때
+
+### Import Swiper JS
+```
+// import Swiper JS
+import Swiper from 'swiper';
+// import Swiper styles
+import 'swiper/css';
+const swiper = new Swiper(...);
+```
+### Navigation, Pagination
+```
+// core version + navigation, pagination modules:
+import Swiper from 'swiper';
+import { Navigation, Pagination } from 'swiper/modules';
+// import Swiper and modules styles
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+// init Swiper:
+const swiper = new Swiper('.swiper', {
+  // configure Swiper to use modules
+  modules: [Navigation, Pagination],
+});
+// **import Swiper bundle with all modules installed**
+import Swiper from 'swiper/bundle';
+// import styles bundle
+import 'swiper/css/bundle';
+// init Swiper:
+const swiper = new Swiper(...);
+```
+---
+## CDN으로 사용할 때
+```
+<script type="module">
+  import Swiper from 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.mjs'
+  const swiper = new Swiper(...)
+</script>
+```
+---
+Example
+
+## **HTML**
+```
+<!-- Slider main container -->
+<div class="swiper">
+  <!-- Additional required wrapper -->
+  <div class="swiper-wrapper">
+    <!-- Slides -->
+    <div class="swiper-slide">Slide 1</div>
+    <div class="swiper-slide">Slide 2</div>
+    <div class="swiper-slide">Slide 3</div>
+  </div>
+  <!-- If we need pagination -->
+  <div class="swiper-pagination"></div>
+  <!-- If we need navigation buttons -->
+  <div class="swiper-button-prev"></div>
+  <div class="swiper-button-next"></div>
+  <!-- If we need scrollbar -->
+  <div class="swiper-scrollbar"></div>
+</div>
+```
+
+## **CSS**
+```
+.swiper {
+  width: 600px;
+  height: 300px;
+}
+```
+
+## **JS**
+```
+const swiper = new Swiper('.swiper', {
+  // Optional parameters
+  direction: 'vertical',
+  loop: true,
+  // If we need pagination
+  pagination: {
+    el: '.swiper-pagination',
+  },
+  // Navigation arrows
+  navigation: {
+    nextEl: '.swiper-button-next',
+    prevEl: '.swiper-button-prev',
+  },
+  // And if we need scrollbar
+  scrollbar: {
+    el: '.swiper-scrollbar',
+  },
+});
+```

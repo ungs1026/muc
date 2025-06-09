@@ -3,8 +3,8 @@ export const navItems = ['library', 'api', 'css', 'font', 'js', 'gsap'];
 
 export const dataMap = {
   library: [
-    { id: 1, title: 'Lodash', desc: '유틸리티 JS 라이브러리' },
-    { id: 2, title: 'Axios', desc: 'HTTP 클라이언트' }
+    { id: 1, title: 'Swiper', desc: '슬라이드 JS 라이브러리' },
+    { id: 2, title: 'Chart JS', desc: 'Graph JS 라이브러리' }
   ],
   api: [
     { id: 1, title: 'Fetch API', desc: '브라우저 내장 HTTP' },

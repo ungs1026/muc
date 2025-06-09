@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Library Admin</title>
+  <!-- Vue 3 -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.6/dist/umd/supabase.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    #app { padding: 20px; }
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .filters button { margin-right: 5px; padding: 5px 10px; }
+    .filters button.active { background-color: #007BFF; color: white; }
+    .add-btn { font-size: 24px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .actions button { margin-right: 5px; }
+    .toolbar { margin-bottom: 5px; }
+    .toolbar button { margin-right: 3px; }
+    /* Modal styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+    .modal { background: white;
+      padding: 20px;
+      border-radius: 5px;
+      width: 70%;
+      max-width: 90%;
+      height: 70%;
+      max-height: 80%;
+      overflow: auto;
+    }
+    .modal h2 { margin-top: 0; }
+    .modal form div { margin-bottom: 10px; }
+    .modal label { display: block; margin-bottom: 5px; }
+    .modal input[type="text"], .modal textarea, .modal select { width: 100%; padding: 5px; }
+    .modal footer { text-align: right; }
+    .modal footer button { margin-left: 5px; }
+    .sub_desc {
+      width: 12rem;
+      height: 50px;
+      overflow: auto;
+    }
+    .context {
+      width: 100%;
+      height: 50px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="filters">
+        <button @click="selectedType = null" :class="{ active: selectedType === null }">All</button>
+        <button v-for="t in types" :key="t" @click="selectedType = (selectedType === t ? null : t)" :class="{ active: selectedType === t }">{{ t }}</button>
+      </div>
+      <div class="add-btn" @click="openAddModal">+</div>
+    </div>
+
+    <table>
+      <thead><tr><th>Idx</th><th>Type</th><th>Title</th><th>Sub Desc</th><th>Context</th><th>Font CDN</th><th>Image</th><th>Free</th><th>Actions</th></thead>
+      <tbody>
+        <tr v-for="rec in filteredRecords" :key="rec.idx">
+          <td>{{ rec.idx }}</td>
+          <td>{{ rec.type }}</td>
+          <td>{{ rec.title }}</td>
+          <td><div class="sub_desc">{{ rec.sub_desc }}</div></td>
+          <td><div class="context">{{ rec.context }}</div></td>
+          <td>{{ rec.font_cdn }}</td>
+          <td><img :src="rec.img" alt="img" style="height:40px;"/></td>
+          <td><input type="checkbox" disabled :checked="rec.isFree" /></td>
+          <td class="actions"><button @click="openEditModal(rec)">Edit</button><button @click="deleteRecord(rec.idx)">Delete</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Add/Edit Modal -->
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+      <div class="modal">
+        <h2>{{ isEdit ? 'Edit' : 'Add' }} Record</h2>
+        <form @submit.prevent="isEdit ? updateRecord() : addRecord()">
+          <div>
+            <label>Type<select v-model="form.type" required><option v-for="t in types" :key="t" :value="t">{{ t }}</option></select></label>
+          </div>
+          <div><label>Title<input type="text" v-model="form.title" required/></label></div>
+          <div><label>Sub Desc<textarea style="height: 10rem;" v-model="form.sub_desc"></textarea></label></div>
+          <div>
+            <label>Context</label>
+            <div class="toolbar">
+              <button type="button" @click="insertMd('# ')">H1</button>
+              <button type="button" @click="insertMd('## ')">H2</button>
+              <button type="button" @click="insertMd('### ')">H3</button>
+              <button type="button" @click="insertMd('**bold**')">B</button>
+              <button type="button" @click="insertMd('*italic*')">I</button>
+              <button type="button" @click="insertMd('```\ncode\n```')">Code</button>
+              <button type="button" @click="insertMd('> ')">Quote</button>
+              <button type="button" @click="insertMd('[text](url)')">Link</button>
+              <button type="button" @click="insertMd('---')">HR</button>
+              <button type="button" @click="insertMd('| Header | |\n| ------ | --- |')">Table</button>
+              <button type="button" @click="insertMd('- [ ] ')">Task</button>
+            </div>
+            <textarea ref="ctx" style="height: 20rem;" v-model="form.context"></textarea>
+          </div>
+          <div><label>Font CDN<input type="text" v-model="form.font_cdn"/></label></div>
+          <div>
+            <label>Image File<input type="file" @change="onFileChange"/></label>
+            <div v-if="isEdit && form.img">
+              <!-- 기존에 저장된 이미지 표시 -->
+              <img :src="form.img" alt="Current Image" style="height:80px; margin-top:5px;"/>
+            </div>
+          </div>
+          <div><label>Free<input type="checkbox" v-model="form.isFree"/></label></div>
+          <footer>
+            <button type="button" @click="closeModal">Cancel</button>
+            <button type="submit">{{ isEdit ? 'Update' : 'Save' }}</button>
+          </footer>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const supabaseUrl = 'https://wjdggchvnpmodzvnpdvc.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndqZGdnY2h2bnBtb2R6dm5wZHZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTQzNjQsImV4cCI6MjA2NDkzMDM2NH0.3zFAf2XwJSgKK_kISbt2wnXPJLQuawbeFKPnJntslUM';
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          records: [], types: ['library','api','css','font','js','gsap'],
+          selectedType: null, showModal: false, isEdit: false,
+          form: { type:'', title:'', sub_desc:'', context:'', font_cdn:'', img:'', isFree:false },
+          file: null, editId: null
+        };
+      },
+      computed: {
+        filteredRecords() {
+          return this.records.filter(r=>!this.selectedType||r.type===this.selectedType);
+        }
+      },
+      methods: {
+        async fetchData() {
+          const { data, error } = await supabaseClient.from('library').select('*').order('idx',{ascending:true});
+          if(error) console.error(error);
+          else this.records = data.map(r=>({ ...r, isFree: r.isfree }));
+        },
+        openAddModal() {
+          this.resetForm(); this.isEdit=false; this.showModal=true;
+        },
+        openEditModal(rec) {
+          this.form = { ...rec, isFree: rec.isFree };
+          this.file = null;
+          this.editId = rec.idx;
+          this.isEdit = true;
+          this.showModal = true;
+        },
+        insertMd(snippet) {
+          const ta = this.$refs.ctx;
+          const start = ta.selectionStart; const end = ta.selectionEnd;
+          const val = this.form.context;
+          this.form.context = val.slice(0,start) + snippet + val.slice(end);
+          this.$nextTick(()=>{ ta.setSelectionRange(start+snippet.length, start+snippet.length); ta.focus(); });
+        },
+        onFileChange(e) {
+          this.file = e.target.files[0] || null;
+        },
+        async uploadImage() {
+          if (!this.file) return null;
+          const fileExt = this.file.name.split('.').pop();
+          const fileName = `${Date.now()}.${fileExt}`;
+          const filePath = fileName;
+          const { error: uploadError } = await supabaseClient.storage
+            .from('lib')
+            .upload(filePath, this.file, { upsert: true });
+          if (uploadError) { console.error('Upload Error:', uploadError); return null; }
+          const { data } = supabaseClient.storage
+            .from('lib')
+            .getPublicUrl(filePath);
+          return data.publicUrl;
+        },
+        async addRecord() {
+          const imageUrl = await this.uploadImage();
+          const payload = {
+            ...this.form,
+            context: this.form.context,
+            sub_desc: this.form.sub_desc,
+            isfree: this.form.isFree,
+            img: imageUrl
+          };
+          delete payload.isFree;
+          const { error } = await supabaseClient.from('library').insert([payload]);
+          if(error) console.error(error);
+          else { this.fetchData(); this.closeModal(); }
+        },
+        async updateRecord() {
+          let imageUrl = this.form.img;
+          if (this.file) {
+            // 기존 파일명을 재사용하여 덮어쓰기
+            const urlObj = new URL(this.form.img);
+            const segments = urlObj.pathname.split('/');
+            const existingFileName = segments[segments.length-1];
+            await supabaseClient.storage
+              .from('lib')
+              .upload(existingFileName, this.file, { upsert: true });
+            const { data } = supabaseClient.storage
+              .from('lib')
+              .getPublicUrl(existingFileName);
+            imageUrl = data.publicUrl;
+          }
+          const payload = {
+            ...this.form,
+            context: this.form.context,
+            sub_desc: this.form.sub_desc,
+            isfree: this.form.isFree,
+            img: imageUrl
+          };
+          delete payload.isFree;
+          const { error } = await supabaseClient.from('library').update(payload).eq('idx',this.editId);
+          if(error) console.error(error);
+          else { this.fetchData(); this.closeModal(); }
+        },
+        async deleteRecord(id) { if(confirm('삭제하시겠습니까?')){ await supabaseClient.from('library').delete().eq('idx',id); this.fetchData(); } },
+        closeModal() { this.showModal=false; },
+        resetForm() { this.form={ type:'',title:'',sub_desc:'',context:'',font_cdn:'',img:'',isFree:false }; this.file=null; }
+      },
+      mounted() { this.fetchData(); }
+    }).mount('#app');
+  </script>
+</body>
+</html>

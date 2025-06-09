@@ -25,13 +25,22 @@ export default {
 
 <style scoped>
 .navbar {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  letter-spacing: 2px;
+  font-size: 18px;
+
   position: fixed;
   top: 0; left: 0; right: 0;
   height: 60px;
-  background: #333;
+  background: #000;
+  box-shadow: 0 0 6px white;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  z-index: 9999;
 }
 .navbar ul {
   list-style: none;
@@ -48,6 +57,6 @@ export default {
 }
 .navbar li:hover,
 .navbar li.active {
-  background: #555;
+  background: var(--main-color);
 }
 </style>
