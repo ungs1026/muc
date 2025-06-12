@@ -38,4 +38,14 @@ body, #app {
   max-width: 1000px;
   margin: 0 auto;
 }
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover{
+  color: #acbaff;
+}
+
 </style>

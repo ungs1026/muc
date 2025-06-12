@@ -1,0 +1,86 @@
+# **Streamline**
+
+All the icons you’ll ever need
+
+Stop wasting time searching for the right icons—Upgrade to Streamline Pro and unlock 300,000+ high-quality, consistent, and fully customizable assets.
+
+---
+
+## COPY, VIEW, DOWNLOAD Link
+```
+https://home.streamlinehq.com/
+```
+
+---
+
+## API
+1) API키를 생성한다.
+2) Start using the API
+```
+const url = 'https://public-api.streamlinehq.com/v1/search/global?productType=icons&query=home';
+const options = {
+  method: 'GET',
+  headers: {accept: 'application/json', 'x-api-key': 'PASTE_YOUR_API_KEY_HERE'}
+};
+fetch(url, options)
+  .then(res => res.json())
+  .then(json => console.log(json))
+  .catch(err => console.error(err));
+```
+3) 사용(fetch)
+```
+{
+  "query": "home",
+  "results": [
+    {
+      "hash": "ico_VgC1LXreoNRxANay",
+      "name": "Home 2",
+      "imagePreviewUrl": "icons/common-icons/home-2-vqpcd601vmikz9f3zzemzd.png/home-2-xuqkrmr56x43m3v6dkbwr",
+      "isFree": true,
+      "familySlug": "core-line-free",
+      "familyName": "Core Line - Free",
+      "categorySlug": "common-icons",
+      "categoryName": "Common icons",
+      "subcategorySlug": "common-icons",
+      "subcategoryName": "Common icons"
+    },
+    {
+      "hash": "ico_wEi0Iwv5LpEW0Pxk",
+      "name": "Home 1",
+      "imagePreviewUrl": "icons/places/home-1-e5zyd25fdm7ihkk8wq9pm.png/home-1-996o8ls1sfnvuxdevf4jt9",
+      "isFree": false,
+      "familySlug": "cyber-duotone",
+      "familyName": "Cyber Duotone",
+      "categorySlug": "category",
+      "categoryName": "Category",
+      "subcategorySlug": "places",
+      "subcategoryName": "Places"
+    },
+   [...more results will appear here]
+  ],
+  "pagination": {
+    "total": 1350,
+    "hasMore": true,
+    "offset": 0,
+    "nextSkip": 50
+  }
+}
+```
+
+---
+
+## **제한**
+### The Streamline API is currently in Beta phase.
+- Free API access during the Beta:
+- Access to free assets only, as you are a free user
+- Up to 25,000 requests/month
+- Up to 500 downloads/month
+- 1,000 requests/hour limit
+
+## **주의**
+- Do not share your API key with others or expose it in the browser or other client-side code.
+
+---
+
+## Link
+[Document](https://streamline-api.readme.io/reference/introduction)

@@ -81,6 +81,7 @@ export default {
       });
 
       // 헤더 (h1~h3)
+      html = html.replace(/^#### (.+)$/gm,    '<h4>$1</h4>')
       html = html.replace(/^### (.+)$/gm,     '<h3>$1</h3>')
       html = html.replace(/^## (.+)$/gm,      '<h2>$1</h2>')
       html = html.replace(/^# (.+)$/gm,       '<h1>$1</h1>')
@@ -150,7 +151,7 @@ export default {
         block = block.trim()
         // 이미 블록요소면 그대로 (코드 블록, 헤더, 리스트 등)
         if (/^<(h[1-6]|ul|ol|li|pre|blockquote|table|img|hr)/.test(block)) return block
-        return `<p style="font-size: 0.8rem;">${block.replace(/\n/g,'<br>')}</p>`
+        return `<p style="font-size: 1rem;">${block.replace(/\n/g,'<br>')}</p>`
       }).join('\n')
 
       return html

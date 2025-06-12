@@ -10,7 +10,7 @@
       </div>
     </div>
     <!-- 그 외는 이미지 출력 -->
-    <div v-else>
+    <div v-else class="card_img">
       <img :src="item.img" :alt="item.title" />
     </div>
 
@@ -57,8 +57,17 @@ export default {
 .card:hover {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.card img {
+.card .card_img {
   width: 100%;
+  height: 100%;
+  display: flex;
+  background: #000;
+}
+
+.card .card_img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 .preview-container {
   width: 100%;
@@ -66,7 +75,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: #000;
+  color: white;
   border: 1px solid #ddd;
   border-radius: 4px;
   margin-bottom: 12px;
