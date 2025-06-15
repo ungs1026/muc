@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Anime.js 기능 정리 및 예제 프리뷰 (수정본 2.0)</title>
+
+    <style>
+
+    body {
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    background-color: #000000;
+
+    color: #ffffff;
+
+    margin: 0;
+
+    padding-top: 80px;
+
+    padding-bottom: 20px;
+
+    }
+
+
+
+    h1, h2, h3 {
+
+        color: #ffffff;
+
+        padding-bottom: 10px;
+
+    }
+
+   
+
+    h1 {
+
+        text-align: center;
+
+        margin-bottom: 40px;
+
+        border-bottom: 2px solid #96A7FF;
+
+    }
+
+
+
+    h2 {
+
+        margin-top: 40px;
+
+        border-bottom: 1px solid #96A7FF;
+
+    }
+
+
+
+    h3 {
+
+        font-size: 1.2em;
+
+        color: #ffffff;
+
+        border-bottom: none;
+
+    }
+
+
+
+    hr {
+
+        border: 0;
+
+        height: 1px;
+
+        background: #96A7FF;
+
+        margin: 60px 0;
+
+    }
+
+
+
+    /* 네비게이션 */
+
+    nav {
+
+        position: sticky;
+
+        top: 0;
+
+        width: 100%;
+
+        background-color: #1a1a1a;
+
+        padding: 15px 0;
+
+        box-shadow: 0 2px 5px rgba(150, 167, 255, 0.2);
+
+        z-index: 1000;
+
+        display: flex;
+
+        justify-content: center;
+
+        flex-wrap: wrap;
+
+        left: 0;
+
+    }
+
+
+
+    nav a {
+
+        color: white;
+
+        text-decoration: none;
+
+        padding: 5px 15px;
+
+        margin: 5px;
+
+        border-radius: 5px;
+
+        transition: background-color 0.3s, color 0.3s;
+
+    }
+
+
+
+    nav a:hover {
+
+        background-color: #96A7FF;
+
+        color: #000;
+
+    }
+
+   
+
+    #content_wrapper {
+
+        padding-inline: 20px;
+
+    }
+
+
+
+    /* 컨텐츠 섹션 */
+
+    .feature-section {
+
+        background-color: #1e1e1e;
+
+        padding: 25px;
+
+        border-radius: 8px;
+
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+
+        margin-bottom: 30px;
+
+    }
+
+
+
+    /* 프리뷰 박스 */
+
+    .preview-box {
+
+        position: relative;
+
+        background-color: #2d2d2d;
+
+        border: 1px solid #96A7FF;
+
+        border-radius: 5px;
+
+        min-height: 150px;
+
+        padding: 20px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        overflow: hidden;
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    .box, .stagger-box {
+
+        width: 50px;
+
+        height: 50px;
+
+        background-color: #96A7FF;
+
+    }
+
+
+
+    /* 컨트롤 버튼 */
+
+    .controls {
+
+        margin-bottom: 20px;
+
+    }
+
+
+
+    .btn {
+
+        background-color: #96A7FF;
+
+        color: #000;
+
+        font-weight: bold;
+
+        border: none;
+
+        padding: 10px 15px;
+
+        margin-right: 10px;
+
+        border-radius: 5px;
+
+        cursor: pointer;
+
+        font-size: 14px;
+
+        transition: background-color 0.3s;
+
+    }
+
+
+
+    .btn:hover {
+
+        background-color: #7a8eda;
+
+    }
+
+   
+
+    .btn.reset-btn {
+
+        background-color: #e74c3c;
+
+        color: #fff;
+
+    }
+
+    .btn.reset-btn:hover {
+
+        background-color: #c0392b;
+
+    }
+
+
+
+    .btn.pause-btn {
+
+        background-color: #f39c12;
+
+        color: #fff;
+
+    }
+
+    .btn.pause-btn:hover {
+
+        background-color: #d35400;
+
+    }
+
+
+
+    /* 코드 블록 */
+
+    pre {
+
+        background-color: #2d2d2d;
+
+        color: #f8f8f2;
+
+        padding: 20px;
+
+        border-radius: 5px;
+
+        overflow-x: auto;
+
+        font-family: 'Courier New', Courier, monospace;
+
+        font-size: 14px;
+
+    }
+
+
+
+    code {
+
+        display: block;
+
+        white-space: pre;
+
+    }
+
+
+
+    /* Timeline Progress Bar (Input Range) */
+
+    .progress-bar {
+
+        -webkit-appearance: none;
+
+        appearance: none;
+
+        width: 100%;
+
+        margin-top: 15px;
+
+        height: 8px;
+
+        background: #444;
+
+        outline: none;
+
+        opacity: 0.7;
+
+        transition: opacity .2s;
+
+        border-radius: 5px;
+
+    }
+
+    .progress-bar:hover {
+
+        opacity: 1;
+
+    }
+
+    .progress-bar::-webkit-slider-thumb {
+
+        -webkit-appearance: none;
+
+        appearance: none;
+
+        width: 20px;
+
+        height: 20px;
+
+        background: #96A7FF;
+
+        cursor: pointer;
+
+        border-radius: 50%;
+
+    }
+
+    .progress-bar::-moz-range-thumb {
+
+        width: 20px;
+
+        height: 20px;
+
+        background: #96A7FF;
+
+        cursor: pointer;
+
+        border-radius: 50%;
+
+    }
+
+
+
+
+
+    /* Text Animation */
+
+    .text-preview {
+
+        font-weight: bold;
+
+        font-size: 2.5em;
+
+        color: #ffffff;
+
+    }
+
+    .text-preview .letter,
+
+    .waapi-letter { /* WAAPI 예제 글자에도 스타일 적용 */
+
+        display: inline-block;
+
+        line-height: 1em;
+
+    }
+
+   
+
+    /* Callbacks */
+
+    #callback-log {
+
+        width: 100%;
+
+        height: 100px;
+
+        background-color: #2d2d2d;
+
+        color: #0f0;
+
+        font-family: 'Courier New', Courier, monospace;
+
+        padding: 10px;
+
+        border-radius: 4px;
+
+        overflow-y: scroll;
+
+        box-sizing: border-box;
+
+    }
+
+    </style>
+
+</head>
+
+<body>
+
+  <nav>
+
+      <a href="#targets">Targets</a>
+
+      <a href="#properties">Properties</a>
+
+      <a href="#keyframes">Keyframes</a>
+
+      <a href="#sync-timelines">Sync Timelines</a>
+
+      <a href="#time-position">Time Position</a>
+
+      <a href="#staggering">Staggering</a>
+
+      <a href="#svg-path">SVG Path</a>
+
+      <a href="#text">Text</a>
+
+      <a href="#callbacks">Callbacks</a>
+
+      <a href="#web-api">Web API</a>
+
+  </nav>
+
+  <div id="content_wrapper">
+
+
+
+    <h1>Anime.js 기능 정리 및 예제 프리뷰 (수정본 2.0)</h1>
+
+
+
+    <div id="targets" class="feature-section">
+
+        <h2>Targets (대상 지정)</h2>
+
+        <div class="preview-box"><div class="box targets-box"></div></div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="targetsAnim.play()">Play</button>
+
+            <button class="btn pause-btn" onclick="targetsAnim.pause()">Pause</button>
+
+            <button class="btn reset-btn" onclick="targetsAnim.restart()">Reset</button>
+
+        </div>
+
+        <pre><code>const targetsAnim = anime({ targets: '.targets-box', ... });</code></pre>
+
+    </div>
+
+
+
+    <hr>
+
+   
+
+    <div id="properties" class="feature-section">
+
+        <h2>Properties & Parameters (속성 및 파라미터)</h2>
+
+        <div class="preview-box"><div class="box properties-box"></div></div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="propertiesAnim.play()">Play</button>
+
+            <button class="btn pause-btn" onclick="propertiesAnim.pause()">Pause</button>
+
+            <button class="btn reset-btn" onclick="propertiesAnim.restart()">Reset</button>
+
+        </div>
+
+        <pre><code>const propertiesAnim = anime({ targets: '.properties-box', ... });</code></pre>
+
+    </div>
+
+   
+
+    <hr>
+
+   
+
+    <div id="keyframes" class="feature-section">
+
+        <h2>Keyframes (키프레임)</h2>
+
+        <div class="preview-box"><div class="box keyframes-box"></div></div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="keyframesAnim.play()">Play</button>
+
+            <button class="btn pause-btn" onclick="keyframesAnim.pause()">Pause</button>
+
+            <button class="btn reset-btn" onclick="keyframesAnim.restart()">Reset</button>
+
+        </div>
+
+        <pre><code>const keyframesAnim = anime({ targets: '.keyframes-box', ... });</code></pre>
+
+    </div>
+
+
+
+    <hr>
+
+   
+
+    <div id="sync-timelines" class="feature-section">
+
+        <h2>Sync Timelines (타임라인 동기화)</h2>
+
+        <p>여러 애니메이션을 하나의 타임라인에 묶어 시간차를 두고 동기화합니다.</p>
+
+        <div class="preview-box">
+
+            <div class="box sync-box" style="background-color:#FF1461"></div>
+
+            <div class="box sync-box" style="background-color:#14FF7A"></div>
+
+            <div class="box sync-box" style="background-color:#14B4FF"></div>
+
+        </div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="syncTimelineAnim.play()">Play</button>
+
+            <button class="btn pause-btn" onclick="syncTimelineAnim.pause()">Pause</button>
+
+            <button class="btn reset-btn" onclick="syncTimelineAnim.restart()">Reset</button>
+
+        </div>
+
+        <input type="range" id="sync-progress" class="progress-bar" value="0" step="0.01" max="100">
+
+        <pre><code>const syncTimelineAnim = anime.timeline({
+
+  easing: 'easeOutExpo',
+
+  autoplay: false,
+
+  update: (anim) => {
+
+    // 진행률에 따라 progress bar 업데이트
+
+    document.querySelector('#sync-progress').value = anim.progress;
+
+  }
+
+});
+
+
+
+syncTimelineAnim
+
+  .add({ targets: '.sync-box:nth-child(1)', translateX: 250 })
+
+  .add({ targets: '.sync-box:nth-child(2)', translateX: 250 }, '-=600')
+
+  .add({ targets: '.sync-box:nth-child(3)', translateX: 250 }, '-=600');
+
+
+
+// Progress bar로 애니메이션 위치 제어(seek)
+
+document.querySelector('#sync-progress').addEventListener('input', (e) => {
+
+  syncTimelineAnim.seek(syncTimelineAnim.duration * (e.target.value / 100));
+
+});</code></pre>
+
+    </div>
+
+   
+
+    <hr>
+
+
+
+    <div id="time-position" class="feature-section">
+
+        <h2>Time Position (시간 위치 제어)</h2>
+
+        <p>Progress Bar(input range)를 이용해 애니메이션의 특정 지점으로 즉시 이동(seek)합니다.</p>
+
+        <div class="preview-box">
+
+            <div class="box time-pos-box"></div>
+
+        </div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="timePositionAnim.play()">Play</button>
+
+            <button class="btn pause-btn" onclick="timePositionAnim.pause()">Pause</button>
+
+            <button class="btn reset-btn" onclick="timePositionAnim.restart()">Reset</button>
+
+        </div>
+
+        <input type="range" id="time-pos-progress" class="progress-bar" value="0" step="0.01" max="100">
+
+        <pre><code>const timePositionAnim = anime({
+
+  targets: '.time-pos-box',
+
+  translateX: 250,
+
+  rotate: 720,
+
+  scale: 1.5,
+
+  duration: 2000,
+
+  easing: 'easeInOutSine',
+
+  autoplay: false,
+
+  direction: 'alternate',
+
+  loop: true,
+
+  update: (anim) => {
+
+    document.querySelector('#time-pos-progress').value = anim.progress;
+
+  }
+
+});
+
+
+
+document.querySelector('#time-pos-progress').addEventListener('input', (e) => {
+
+  timePositionAnim.seek(timePositionAnim.duration * (e.target.value / 100));
+
+});</code></pre>
+
+    </div>
+
+
+
+    <hr>
+
+   
+
+    <div id="staggering" class="feature-section">
+
+        <h2>Staggering (스태거링)</h2>
+
+        <div class="preview-box stagger-preview">
+
+            <div class="stagger-box"></div><div class="stagger-box"></div><div class="stagger-box"></div><div class="stagger-box"></div><div class="stagger-box"></div>
+
+        </div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="staggeringAnim.play()">Play</button>
+
+            <button class="btn pause-btn" onclick="staggeringAnim.pause()">Pause</button>
+
+            <button class="btn reset-btn" onclick="staggeringAnim.restart()">Reset</button>
+
+        </div>
+
+        <pre><code>const staggeringAnim = anime({ targets: '.stagger-box', ... });</code></pre>
+
+    </div>
+
+
+
+    <hr>
+
+   
+
+    <div id="svg-path" class="feature-section">
+
+        <h2>SVG Motion Path (SVG 경로 애니메이션)</h2>
+
+        <div class="preview-box">
+
+            <svg width="250" height="150" viewBox="0 0 250 150">
+
+                <path id="motionPath" fill="none" stroke="#ddd" stroke-width="2" d="M20,75 C 80,150 170,-20 230,75"/>
+
+                <circle class="svg-circle" r="8" fill="#3498db"/>
+
+            </svg>
+
+        </div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="svgAnim.play()">Play</button>
+
+            <button class="btn pause-btn" onclick="svgAnim.pause()">Pause</button>
+
+            <button class="btn reset-btn" onclick="svgAnim.restart()">Reset</button>
+
+        </div>
+
+        <pre><code>const svgAnim = anime({ targets: '.svg-circle', ... });</code></pre>
+
+    </div>
+
+   
+
+    <hr>
+
+
+
+    <div id="text" class="feature-section">
+
+        <h2>Text (텍스트 애니메이션)</h2>
+
+        <h3>글자별 애니메이션</h3>
+
+        <div class="preview-box"><h3 class="text-preview" id="text-letters">ANIME.JS</h3></div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="letterAnim.play()">Play</button><button class="btn pause-btn" onclick="letterAnim.pause()">Pause</button><button class="btn reset-btn" onclick="letterAnim.restart()">Reset</button>
+
+        </div>
+
+        <pre><code>const letterAnim = anime.timeline({ ... });</code></pre>
+
+
+
+        <h3 style="margin-top: 40px;">숫자 카운팅</h3>
+
+        <div class="preview-box"><h3 class="text-preview" id="text-number">0</h3></div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="numberAnim.play()">Play</button><button class="btn pause-btn" onclick="numberAnim.pause()">Pause</button><button class="btn reset-btn" onclick="numberAnim.restart()">Reset</button>
+
+        </div>
+
+        <pre><code>const numberAnim = anime({ targets: numberObject, ... });</code></pre>
+
+    </div>
+
+
+
+    <hr>
+
+
+
+    <div id="callbacks" class="feature-section">
+
+        <h2>Callbacks (콜백)</h2>
+
+        <p>애니메이션의 생명주기의 특정 시점에 함수를 실행합니다. (3회 반복)</p>
+
+        <div class="preview-box" style="flex-direction: column; align-items: stretch;">
+
+            <div class="box callbacks-box" style="margin-bottom: 20px;"></div>
+
+            <div id="callback-log"></div>
+
+        </div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="callbacksAnim.play()">Play</button>
+
+            <button class="btn pause-btn" onclick="callbacksAnim.pause()">Pause</button>
+
+            <button class="btn reset-btn" onclick="resetCallbacks()">Reset</button>
+
+        </div>
+
+        <pre><code>const callbacksAnim = anime({
+
+  targets: '.callbacks-box',
+
+  translateX: 250,
+
+  direction: 'alternate',
+
+  loop: 3,
+
+  autoplay: false,
+
+  // Callbacks
+
+  begin: (anim) => logCallback('Animation Began'),
+
+  loopBegin: (anim) => logCallback(`Loop Begin: ${anim.remaining+1}`),
+
+  update: (anim) => { /* Fires on every frame, too noisy for this log */ },
+
+  loopComplete: (anim) => logCallback(`Loop Complete: ${anim.remaining}`),
+
+  complete: (anim) => logCallback('Animation Completed!'),
+
+});</code></pre>
+
+    </div>
+
+   
+
+    <hr>
+
+   
+
+    <div id="web-api" class="feature-section">
+
+        <h2>Web Animation API Integration</h2>
+
+        <p>Anime.js를 브라우저 네이티브 WAAPI와 연동하여 '물결 효과'를 제어합니다.</p>
+
+        <div class="preview-box">
+
+             <h3 class="text-preview" id="waapi-text">Web Animation API</h3>
+
+        </div>
+
+        <div class="controls">
+
+            <button class="btn play-btn" onclick="playWaapi()">Play</button>
+
+            <button class="btn pause-btn" onclick="pauseWaapi()">Pause</button>
+
+            <button class="btn reset-btn" onclick="resetWaapi()">Reset</button>
+
+        </div>
+
+        <pre><code>// 1. 각 글자를 span 태그로 감싸기
+
+const waapiWrapper = document.querySelector('#waapi-text');
+
+waapiWrapper.innerHTML = waapiWrapper.textContent.replace(/\S/g, "&lt;span class='waapi-letter'&gt;$&lt;/span&gt;");
+
+
+
+// 2. webapi: true로 애니메이션 정의
+
+const waapiAnims = anime({
+
+  targets: '.waapi-letter',
+
+  translateY: ["-0.5em", "0.5em"],
+
+  easing: 'easeInOutSine',
+
+  direction: 'alternate',
+
+  loop: true,
+
+  delay: anime.stagger(50),
+
+  autoplay: false,
+
+  webapi: true // 네이티브 Animation 객체 배열을 반환
+
+});
+
+
+
+// 3. 네이티브 WAAPI 메서드로 제어
+
+function playWaapi() {
+
+  // 반환값이 배열인지 단일 객체인지 확인하여 처리
+
+  if (Array.isArray(waapiAnims)) {
+
+    waapiAnims.forEach(anim => anim.play());
+
+  } else {
+
+    waapiAnims.play();
+
+  }
+
+}
+
+// ... pauseWaapi, resetWaapi도 동일하게 수정
+
+</code></pre>
+
+    </div>
+
+</div>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+   
+
+    <script>
+
+        // --- 기존 코드 (수정 없음) ---
+
+        const targetsAnim = anime({ targets: '.targets-box', translateX: 250, rotate: '1turn', backgroundColor: '#e74c3c', duration: 1500, easing: 'easeInOutQuad', autoplay: false });
+
+        const propertiesAnim = anime({ targets: '.properties-box', translateX: { value: 250, duration: 800 }, rotate: { value: 360, duration: 1800, easing: 'easeInOutSine' }, scale: { value: 2, duration: 1600, delay: 800, easing: 'easeInOutQuart' }, direction: 'alternate', loop: true, autoplay: false });
+
+        const keyframesAnim = anime({ targets: '.keyframes-box', translateX: [ { value: 250, duration: 1000, delay: 500 }, { value: 0, duration: 1000, delay: 500 } ], translateY: [ { value: -40, duration: 500 }, { value: 40, duration: 500, delay: 1000 }, { value: 0, duration: 500, delay: 1000 } ], easing: 'easeOutElastic(1, .8)', loop: true, autoplay: false });
+
+        const staggeringAnim = anime({ targets: '.stagger-box', translateX: 270, delay: anime.stagger(100), easing: 'easeInOutQuad', direction: 'alternate', loop: true, autoplay: false });
+
+        const path = anime.path('#motionPath');
+
+        const svgAnim = anime({ targets: '.svg-circle', translateX: path('x'), translateY: path('y'), rotate: path('angle'), easing: 'easeInOutSine', duration: 2000, loop: true, direction: 'alternate', autoplay: false });
+
+        const textWrapper = document.querySelector('#text-letters');
+
+        textWrapper.innerHTML = textWrapper.textContent.replace(/\S/g, "<span class='letter'>$&</span>");
+
+        const letterAnim = anime.timeline({loop: true, autoplay: false, direction: 'alternate'}).add({ targets: '#text-letters .letter', scale: [0.3, 1], opacity: [0, 1], translateZ: 0, easing: "easeOutExpo", duration: 800, delay: (el, i) => 70 * i }).add({ targets: '#text-letters', opacity: 0.5, duration: 1000, easing: "easeOutExpo", delay: 1000 });
+
+        let numberObject = { value: 0 };
+
+        const numberEl = document.querySelector('#text-number');
+
+        const numberAnim = anime({ targets: numberObject, value: 2024, round: 1, easing: 'easeInOutExpo', duration: 2000, autoplay: false, update: function() { numberEl.innerHTML = numberObject.value; } });
+
+        const syncProgressBar = document.querySelector('#sync-progress');
+
+        const syncTimelineAnim = anime.timeline({ easing: 'easeOutExpo', autoplay: false, update: (anim) => { syncProgressBar.value = anim.progress; } });
+
+        syncTimelineAnim.add({ targets: '.sync-box:nth-child(1)', translateX: 250 }).add({ targets: '.sync-box:nth-child(2)', translateX: 250 }, '-=600').add({ targets: '.sync-box:nth-child(3)', translateX: 250 }, '-=600');
+
+        syncProgressBar.addEventListener('input', (e) => { syncTimelineAnim.seek(syncTimelineAnim.duration * (e.target.value / 100)); });
+
+        const timePosProgressBar = document.querySelector('#time-pos-progress');
+
+        const timePositionAnim = anime({ targets: '.time-pos-box', translateX: 250, rotate: 720, scale: 1.5, duration: 2000, easing: 'easeInOutSine', autoplay: false, direction: 'alternate', loop: true, update: (anim) => { timePosProgressBar.value = anim.progress; } });
+
+        timePosProgressBar.addEventListener('input', (e) => { timePositionAnim.seek(timePositionAnim.duration * (e.target.value / 100)); });
+
+        const logEl = document.querySelector('#callback-log');
+
+        const logCallback = (message) => { logEl.innerHTML += `<div>${message}</div>`; logEl.scrollTop = logEl.scrollHeight; };
+
+        const callbacksAnim = anime({ targets: '.callbacks-box', translateX: 250, easing: 'easeInOutQuad', direction: 'alternate', duration: 1000, loop: 3, autoplay: false, begin: (anim) => logCallback('Animation Began'), loopBegin: (anim) => logCallback(`Loop Begin: ${anim.remaining+1} / 3`), loopComplete: (anim) => logCallback(`Loop Complete: ${anim.remaining} remaining`), complete: (anim) => logCallback('Animation Completed!'), });
+
+        function resetCallbacks() { logEl.innerHTML = ''; callbacksAnim.restart(); }
+
+       
+
+        // --- 신규 및 수정된 코드 ---
+
+
+
+        // Web Animation API
+
+        const waapiWrapper = document.querySelector('#waapi-text');
+
+        waapiWrapper.innerHTML = waapiWrapper.textContent.replace(/\S/g, "<span class='waapi-letter'>$&</span>");
+
+       
+
+        const waapiAnims = anime({
+
+          targets: '.waapi-letter',
+
+          translateY: [
+
+            "-0.5em",
+
+            "0.5em"
+
+          ],
+
+          easing: 'easeInOutSine',
+
+          direction: 'alternate',
+
+          loop: true,
+
+          delay: anime.stagger(50),
+
+          autoplay: false,
+
+          webapi: true
+
+        });
+
+       
+
+        // [오류 수정] waapiAnims가 배열일 경우와 단일 객체일 경우를 모두 처리하도록 수정
+
+        function playWaapi() {
+
+          if (Array.isArray(waapiAnims)) {
+
+            waapiAnims.forEach(anim => anim.play());
+
+          } else if (waapiAnims) {
+
+            waapiAnims.play();
+
+          }
+
+        }
+
+
+
+        function pauseWaapi() {
+
+          if (Array.isArray(waapiAnims)) {
+
+            waapiAnims.forEach(anim => anim.pause());
+
+          } else if (waapiAnims) {
+
+            waapiAnims.pause();
+
+          }
+
+        }
+
+
+
+        function resetWaapi() {
+
+          if (Array.isArray(waapiAnims)) {
+
+            waapiAnims.forEach(anim => anim.cancel());
+
+          } else if (waapiAnims) {
+
+            waapiAnims.cancel();
+
+          }
+
+        }
+
+
+
+    </script>
+
+</body>
+
+</html>
+
+
+
+위 코드는 anime.js의 프리뷰 페이지이다. 이와 같이 slick.js도 프리뷰 페이지를 만든다. 다음 요구사항에 만족하게 생성해라.
+
+1. tailwindcss를 사용하지 않고 css를 사용한다.
+2. html, css, js는 모두 한 파일 안에 존재해야한다.
+3. slick.js의 docs를 기준으로 제시된 예제를 모두 표시해야한다. 이 때 데이터는 임시 데이터를 작성해서 구현한다.
+4. 애니메이션이 존재하는 경우 하단에 play와 pause, reset 버튼을 생성하여 각각 재생, 정지, 초기화 기능을 하도록 구현한다.
+
+다음 요구사항에 맞춰 코드를 수정 및 생성한다. 수정 후 전체 코드를 생략 없이 모두 한 파일로 출력한다.

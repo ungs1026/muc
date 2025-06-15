@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slick.js 기능 정리 및 예제 프리뷰</title>
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            padding-top: 80px;
+            padding-bottom: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #ffffff;
+            padding-bottom: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #96A7FF;
+        }
+
+        h2 {
+            margin-top: 40px;
+            border-bottom: 1px solid #96A7FF;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #96A7FF;
+            margin: 60px 0;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background-color: #1a1a1a;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(150, 167, 255, 0.2);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            left: 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            font-size: 14px;
+        }
+
+        nav a:hover {
+            background-color: #96A7FF;
+            color: #000;
+        }
+        
+        #content_wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-inline: 20px;
+        }
+
+        .feature-section {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .preview-box {
+            position: relative;
+            background-color: #2d2d2d;
+            border: 1px solid #96A7FF;
+            border-radius: 5px;
+            min-height: 200px;
+            padding: 40px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #96A7FF;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 10px 15px;
+            margin-right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #7a8eda;
+        }
+        
+        .btn.reset-btn {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        .btn.reset-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .btn.pause-btn {
+            background-color: #f39c12;
+            color: #fff;
+        }
+        .btn.pause-btn:hover {
+            background-color: #d35400;
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        /* --- Slick Slider Custom Styles --- */
+        .slider-container { width: 100%; }
+        .slider-item {
+            background: #5a67d8;
+            color: white;
+            height: 120px;
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            margin: 0 10px;
+            border-radius: 8px;
+            border: 2px solid #1e1e1e;
+        }
+        .slider-item img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;}
+        .adaptive-height-item { padding: 20px; text-align: center; }
+        .slick-prev:before, .slick-next:before { color: #96A7FF; }
+        .slick-dots li button:before { color: #96A7FF; }
+        .slick-dots li.slick-active button:before { color: #ffffff; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#single">Single Item</a>
+        <a href="#multiple">Multiple Items</a>
+        <a href="#responsive">Responsive</a>
+        <a href="#variable-width">Variable Width</a>
+        <a href="#adaptive-height">Adaptive Height</a>
+        <a href="#data-attr">Data Attributes</a>
+        <a href="#center-mode">Center Mode</a>
+        <a href="#lazy-load">Lazy Loading</a>
+        <a href="#autoplay">Autoplay</a>
+        <a href="#fade">Fade</a>
+        <a href="#add-remove">Add & Remove</a>
+        <a href="#filtering">Filtering</a>
+        <a href="#destroy">Destroy</a>
+    </nav>
+    <div id="content_wrapper">
+        <h1>Slick.js 기능 정리 및 예제 프리뷰</h1>
+
+        <div id="single" class="feature-section">
+            <h2>Single Item</h2>
+            <div class="preview-box"><div class="slider-container slider-single">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div>
+            </div></div>
+            <pre><code>$('.slider-single').slick();</code></pre>
+        </div><hr>
+
+        <div id="multiple" class="feature-section">
+            <h2>Multiple Items</h2>
+            <div class="preview-box"><div class="slider-container slider-multiple">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div><div class="slider-item"><h3>4</h3></div><div class="slider-item"><h3>5</h3></div>
+            </div></div>
+            <pre><code>$('.slider-multiple').slick({ slidesToShow: 3, slidesToScroll: 3 });</code></pre>
+        </div><hr>
+
+        <div id="responsive" class="feature-section">
+            <h2>Responsive Display</h2>
+            <div class="preview-box"><div class="slider-container slider-responsive">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div><div class="slider-item"><h3>4</h3></div><div class="slider-item"><h3>5</h3></div><div class="slider-item"><h3>6</h3></div>
+            </div></div>
+            <pre><code>$('.slider-responsive').slick({
+    slidesToShow: 4,
+    responsive: [
+        { breakpoint: 1024, settings: { slidesToShow: 3 } },
+        { breakpoint: 600, settings: { slidesToShow: 2 } }
+    ]
+});</code></pre>
+        </div><hr>
+
+        <div id="variable-width" class="feature-section">
+            <h2>Variable Width</h2>
+            <div class="preview-box"><div class="slider-container slider-variable">
+                <div class="slider-item" style="width: 200px;"><h3>200px</h3></div><div class="slider-item" style="width: 150px;"><h3>150px</h3></div><div class="slider-item" style="width: 300px;"><h3>300px</h3></div>
+            </div></div>
+            <pre><code>$('.slider-variable').slick({ variableWidth: true });</code></pre>
+        </div><hr>
+
+        <div id="adaptive-height" class="feature-section">
+            <h2>Adaptive Height</h2>
+            <div class="preview-box"><div class="slider-container slider-adaptive">
+                <div class="slider-item adaptive-height-item"><h3>Slide 1</h3><p>Short content.</p></div>
+                <div class="slider-item adaptive-height-item"><h3>Slide 2</h3><p>This slide has more content, making it taller than the first one. The slider will adapt its height.</p></div>
+            </div></div>
+            <pre><code>$('.slider-adaptive').slick({ adaptiveHeight: true });</code></pre>
+        </div><hr>
+
+        <div id="data-attr" class="feature-section">
+            <h2>Data Attribute Settings</h2>
+            <div class="preview-box"><div class="slider-container slider-data" data-slick='{"slidesToShow": 4, "slidesToScroll": 4}'>
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div><div class="slider-item"><h3>4</h3></div><div class="slider-item"><h3>5</h3></div>
+            </div></div>
+            <pre><code>&lt;div class="slider-data" data-slick='{"slidesToShow": 4, "slidesToScroll": 4}'&gt;
+    ...
+&lt;/div&gt;
+
+&lt;script&gt;
+    $('.slider-data').slick(); // JS에서는 호출만 하면 됩니다.
+&lt;/script&gt;</code></pre>
+        </div><hr>
+        
+        <div id="center-mode" class="feature-section">
+            <h2>Center Mode</h2>
+            <div class="preview-box"><div class="slider-container slider-center">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div><div class="slider-item"><h3>4</h3></div>
+            </div></div>
+            <pre><code>$('.slider-center').slick({ centerMode: true, centerPadding: '60px', slidesToShow: 1 });</code></pre>
+        </div><hr>
+        
+        <div id="lazy-load" class="feature-section">
+            <h2>Lazy Loading</h2>
+            <div class="preview-box"><div class="slider-container slider-lazy">
+                <div class="slider-item"><img style="object-fit: contain;" data-lazy="https://picsum.photos/id/237/400/200"></div>
+                <div class="slider-item"><img style="object-fit: contain;" data-lazy="https://picsum.photos/id/238/400/200"></div>
+                <div class="slider-item"><img style="object-fit: contain;" data-lazy="https://picsum.photos/id/239/400/200"></div>
+                <div class="slider-item"><img style="object-fit: contain;" data-lazy="https://picsum.photos/id/240/400/200"></div>
+            </div></div>
+            <pre><code>&lt;img data-lazy="image-source.jpg"&gt;
+...
+$('.slider-lazy').slick({ lazyLoad: 'ondemand' });</code></pre>
+        </div><hr>
+
+        <div id="autoplay" class="feature-section">
+            <h2>Autoplay</h2>
+            <div class="preview-box"><div class="slider-container slider-autoplay">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div>
+            </div></div>
+            <div class="controls"><button class="btn play-btn" onclick="playSlider()">Play</button><button class="btn pause-btn" onclick="pauseSlider()">Pause</button></div>
+            <pre><code>$('.slider-autoplay').slick({ autoplay: true, autoplaySpeed: 2000 });</code></pre>
+        </div><hr>
+
+        <div id="fade" class="feature-section">
+            <h2>Fade Effect</h2>
+            <div class="preview-box"><div class="slider-container slider-fade">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div>
+            </div></div>
+            <pre><code>$('.slider-fade').slick({ dots: true, infinite: true, speed: 500, fade: true, cssEase: 'linear' });</code></pre>
+        </div><hr>
+
+        <div id="add-remove" class="feature-section">
+            <h2>Add & Remove</h2>
+            <div class="preview-box"><div class="slider-container slider-add-remove">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div>
+            </div></div>
+            <div class="controls"><button class="btn" onclick="addSlide()">Add Slide</button><button class="btn reset-btn" onclick="removeSlide()">Remove Last Slide</button></div>
+            <pre><code>$('.slider').slick('slickAdd', '&lt;div&gt;...&lt;/div&gt;');
+$('.slider').slick('slickRemove', index);</code></pre>
+        </div><hr>
+
+        <div id="filtering" class="feature-section">
+            <h2>Filtering</h2>
+            <div class="preview-box"><div class="slider-container slider-filter">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div><div class="slider-item"><h3>4</h3></div><div class="slider-item"><h3>5</h3></div><div class="slider-item"><h3>6</h3></div>
+            </div></div>
+            <div class="controls"><button class="btn" onclick="filterSlides(1)">Filter Odds</button><button class="btn" onclick="filterSlides(2)">Filter Evens</button><button class="btn reset-btn" onclick="unfilterSlides()">Unfilter</button></div>
+            <pre><code>$('.slider').slick('slickFilter', ':even'); // or ':odd' or a custom selector
+$('.slider').slick('slickUnfilter');</code></pre>
+        </div><hr>
+        
+        <div id="destroy" class="feature-section">
+            <h2>Destroy</h2>
+            <div class="preview-box"><div class="slider-container slider-destroy">
+                <div class="slider-item"><h3>1</h3></div><div class="slider-item"><h3>2</h3></div><div class="slider-item"><h3>3</h3></div>
+            </div></div>
+            <div class="controls"><button class="btn" onclick="initSlider()">Initialize</button><button class="btn reset-btn" onclick="destroySlider()">Destroy</button></div>
+            <pre><code>$('.slider').slick('unslick');</code></pre>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+    <script>
+        const destroyOptions = { dots: true };
+        let addRemoveCounter = 3;
+
+        $(document).ready(function(){
+            $('.slider-single').slick({ dots: true });
+            $('.slider-multiple').slick({ dots: true, infinite: true, slidesToShow: 3, slidesToScroll: 3 });
+            $('.slider-responsive').slick({ dots: true, infinite: true, speed: 500, slidesToShow: 4, slidesToScroll: 4, responsive: [ { breakpoint: 1024, settings: { slidesToShow: 3, slidesToScroll: 3 } }, { breakpoint: 600, settings: { slidesToShow: 2, slidesToScroll: 2 } }] });
+            $('.slider-variable').slick({ dots: true, infinite: true, variableWidth: true });
+            $('.slider-adaptive').slick({ dots: true, infinite: true, adaptiveHeight: true });
+            $('.slider-data').slick();
+            $('.slider-center').slick({ centerMode: true, centerPadding: '60px', slidesToShow: 1, arrows: false, dots: true, responsive: [{ breakpoint: 768, settings: { slidesToShow: 1 } }] });
+            $('.slider-lazy').slick({ lazyLoad: 'ondemand', slidesToShow: 1, slidesToScroll: 1 });
+            $('.slider-autoplay').slick({ dots: true, autoplay: true, autoplaySpeed: 2000 });
+            $('.slider-fade').slick({ dots: true, infinite: true, speed: 500, fade: true, cssEase: 'linear' });
+            $('.slider-add-remove').slick({ dots: true, slidesToShow: 3 });
+            $('.slider-filter').slick({ slidesToShow: 4, slidesToScroll: 4 });
+            $('.slider-destroy').slick(destroyOptions);
+        });
+
+        // --- Control Functions ---
+        function playSlider() { $('.slider-autoplay').slick('slickPlay'); }
+        function pauseSlider() { $('.slider-autoplay').slick('slickPause'); }
+        function addSlide() {
+            addRemoveCounter++;
+            $('.slider-add-remove').slick('slickAdd', '<div class="slider-item"><h3>' + addRemoveCounter + '</h3></div>');
+        }
+        function removeSlide() {
+            if (addRemoveCounter > 0) {
+                // slickRemove는 index를 필요로 하므로 마지막 index를 찾아서 제거
+                $('.slider-add-remove').slick('slickRemove', addRemoveCounter - 1);
+                if(addRemoveCounter > 0) addRemoveCounter--;
+            }
+        }
+        function filterSlides(type) {
+            $('.slider-filter').slick('slickUnfilter');
+            if(type === 1) $('.slider-filter').slick('slickFilter', function(index) { return index % 2 !== 0; }); // 홀수번째 슬라이드 (index는 0부터)
+            if(type === 2) $('.slider-filter').slick('slickFilter', function(index) { return index % 2 === 0; }); // 짝수번째 슬라이드
+        }
+        function unfilterSlides() { $('.slider-filter').slick('slickUnfilter'); }
+        function initSlider() { $('.slider-destroy').not('.slick-initialized').slick(destroyOptions); }
+        function destroySlider() { if ($('.slider-destroy').hasClass('slick-initialized')) { $('.slider-destroy').slick('unslick'); } }
+    </script>
+</body>
+</html>

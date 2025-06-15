@@ -1,5 +1,27 @@
 <template>
   <div class="detail-page" v-if="item">
+    <a
+      v-if="item.preview_url && windowWidth >= 1300"
+      :href="item.preview_url"
+      target="_blank"
+      class="preview-btn-fixed"
+    >
+      PREVIEW
+    </a>
+
+    <div class="top-right-controls">
+      <a
+        v-if="item.preview_url && windowWidth < 1300"
+        :href="item.preview_url"
+        target="_blank"
+        class="preview-btn-inline"
+        @click.stop
+      >
+        PREVIEW
+      </a>
+      <button id="goList" @click.stop="goBack">LIST</button>
+    </div>
+    
     <h2>{{ item.title }}</h2>
 
     <div class="main_img" style="width: 100%;">
@@ -9,24 +31,21 @@
     <div class="markdown" v-html="renderMarkdown(item.sub_desc)"></div>
 
     <div class="markdown" v-html="renderMarkdown(item.context)"></div>
-
-    <button id="goList" @click="goBack">LIST</button>
   </div>
   <div v-else>
     <p>Loading...</p>
   </div>
+
+  <button class="scroll-to-top-btn" @click="scrollToTop">▲</button>
 </template>
 
 <script>
-import { ref, onMounted, nextTick } from 'vue' // nextTick 추가
+import { ref, onMounted, nextTick, onUnmounted } from 'vue' // onUnmounted 추가
 import { useRouter, useRoute } from 'vue-router'
 import { supabase } from '../supabase'
-import hljs from 'highlight.js' // hljs를 named import 대신 default import로 변경
+import hljs from 'highlight.js'
 
-// Highlight.js 테마 CSS 임포트 (만약 Vue CLI/Vite 등으로 번들링한다면)
-// 실제 프로젝트 설정에 따라 이 위치나 방식이 다를 수 있습니다.
-// CSS는 <style> 태그에 직접 포함하거나, main.js에서 임포트할 수도 있습니다.
-import 'highlight.js/styles/atom-one-dark.css'; // 원하는 테마 CSS 선택
+import 'highlight.js/styles/atom-one-dark.css';
 
 export default {
   name: 'DetailPage',
@@ -36,6 +55,12 @@ export default {
     const category = route.params.category
     const id = Number(route.params.id)
     const item = ref(null)
+    const windowWidth = ref(window.innerWidth) // 창 너비를 저장할 ref
+
+    // 창 크기 변경 감지 핸들러
+    const handleResize = () => {
+      windowWidth.value = window.innerWidth
+    }
 
     async function fetchItem() {
       const { data, error } = await supabase
@@ -49,42 +74,74 @@ export default {
         item.value = null
       } else {
         item.value = data;
-        // 데이터 로드 및 DOM 업데이트 후 하이라이팅 적용
-        // nextTick을 사용하여 DOM이 완전히 업데이트된 후에 hljs를 실행
         nextTick(() => {
           hljs.highlightAll();
         });
       }
     }
 
-    onMounted(fetchItem)
+    onMounted(() => {
+      fetchItem();
+      // resize 이벤트 리스너 추가
+      window.addEventListener('resize', handleResize);
+    });
+
+    onUnmounted(() => {
+        // 컴포넌트가 사라질 때 이벤트 리스너 제거
+        window.removeEventListener('resize', handleResize);
+    });
 
     function goBack() {
       router.back()
     }
 
-    // 수동 Markdown → HTML 변환기
+    // 최상단으로 스크롤하는 함수
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function handleCopyClick(event) {
+      const target = event.target;
+      if (target.classList.contains('copy-button')) {
+        const pre = target.nextElementSibling;
+        if (pre && pre.tagName === 'PRE') {
+          const code = pre.innerText;
+          try {
+            await navigator.clipboard.writeText(code);
+            target.textContent = 'Copied!';
+            setTimeout(() => {
+              target.textContent = 'Copy';
+            }, 2000);
+          } catch (err) {
+            console.error('Failed to copy text: ', err);
+            target.textContent = 'Error';
+            setTimeout(() => {
+              target.textContent = 'Copy';
+            }, 2000);
+          }
+        }
+      }
+    }
+
     function renderMarkdown(text) {
       if (!text) return ''
 
       let html = text
 
-      // ```language\nCode\n``` 형식의 코드 블록 처리
-      // 이 정규식은 언어 지정(예: ```javascript)도 캡처합니다.
-      // 언어 지정이 없는 경우에도 작동합니다.
       html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (_, lang, code) => {
-        // HTML 이스케이프: < > & 등을 HTML 엔티티로 변환하여 코드 내용이 HTML로 파싱되지 않게 함
-        const escapedCode = code.replace(/&/g, '&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        // 언어가 지정된 경우 'language-언어명' 클래스 추가
+        const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const langClass = lang ? `language-${lang}` : '';
-        return `<pre><code class="${langClass}">${escapedCode}</code></pre>`;
+        return `<div class="code-block-wrapper">
+                  <button class="copy-button">Copy</button>
+                  <pre><code class="${langClass}">${escapedCode.trim()}</code></pre>
+                </div>`;
       });
 
       // 헤더 (h1~h3)
-      html = html.replace(/^#### (.+)$/gm,    '<h4>$1</h4>')
-      html = html.replace(/^### (.+)$/gm,     '<h3>$1</h3>')
-      html = html.replace(/^## (.+)$/gm,      '<h2>$1</h2>')
-      html = html.replace(/^# (.+)$/gm,       '<h1>$1</h1>')
+      html = html.replace(/^#### (.+)$/gm,     '<h4>$1</h4>')
+      html = html.replace(/^### (.+)$/gm,      '<h3>$1</h3>')
+      html = html.replace(/^## (.+)$/gm,       '<h2>$1</h2>')
+      html = html.replace(/^# (.+)$/gm,        '<h1>$1</h1>')
 
       // 수평선
       html = html.replace(/^(?:---|\*\*\*|___)\s*$/gm, '<hr>')
@@ -102,8 +159,6 @@ export default {
       html = html.replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
 
       // 리스트(<ul> 또는 <ol>) 감싸기
-      // 이 부분은 수동 파서에서 가장 복잡하고 버그가 많을 수 있습니다.
-      // Marked.js 같은 라이브러리를 사용하면 훨씬 견고해집니다.
       html = html
         .replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
         .replace(/<ul>\s*<ul>/g, '<ul>')
@@ -149,8 +204,7 @@ export default {
       // 단락: 빈 줄 기준으로 <p> 감싸기
       html = html.split(/\n{2,}/).map(block => {
         block = block.trim()
-        // 이미 블록요소면 그대로 (코드 블록, 헤더, 리스트 등)
-        if (/^<(h[1-6]|ul|ol|li|pre|blockquote|table|img|hr)/.test(block)) return block
+        if (/^<(h[1-6]|ul|ol|li|pre|blockquote|table|img|hr|div)/.test(block)) return block
         return `<p style="font-size: 1rem;">${block.replace(/\n/g,'<br>')}</p>`
       }).join('\n')
 
@@ -159,15 +213,17 @@ export default {
 
     return {
       item,
+      windowWidth, // 템플릿에서 사용할 수 있도록 반환
       goBack,
-      renderMarkdown
+      scrollToTop, // 템플릿에서 사용할 수 있도록 반환
+      renderMarkdown,
+      handleCopyClick
     }
   }
 }
 </script>
 
 <style scoped>
-
 .detail-page {
   position: relative;
   margin: 20px;
@@ -184,7 +240,10 @@ export default {
   margin-bottom: 2rem;
 }
 
-/* 마크다운 렌더링 영역 스타일 */
+.main_img img {
+  width: 40%;
+}
+
 .markdown {
   background: #000;
   color: white;
@@ -193,64 +252,90 @@ export default {
   margin-bottom: 1em;
 }
 
-/* 테이블 스타일 */
-.markdown table {
+.markdown :deep(table) {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1em;
 }
-.markdown th,
-.markdown td {
+.markdown :deep(th),
+.markdown :deep(td) {
   border: 1px solid #ccc;
   padding: 0.5em;
   text-align: left;
 }
 
-/* 코드 블록 스타일 - Highlight.js 테마에 의해 오버라이드될 수 있음 */
-.markdown pre {
-  background: #272822; /* 기본 배경색 (테마가 로드되지 않았거나 다른 스타일) */
-  color: #f8f8f2;      /* 기본 글자색 */
-  padding: 1em;
-  overflow-x: auto;
-  border-radius: 4px;
-}
-
-/* Highlight.js에 의해 추가되는 .hljs 클래스에 대한 추가 스타일 (선택 사항) */
-/* .markdown pre code.hljs {
-    padding: 0; // Highlight.js가 자체 패딩을 추가할 수 있으므로, pre에 패딩을 주고 code에서는 제거
-    background: none; // Highlight.js가 자체 배경색을 추가할 수 있으므로, 제거
-} */
-
-.hljs{
-  text-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-
-/* 블록인용 스타일 */
-.markdown blockquote {
-  border-left: 4px solid #ccc;
-  padding-left: 1em;
-  color: #666;
+.markdown :deep(.code-block-wrapper) {
+  position: relative;
   margin: 1em 0;
 }
 
-/* 리스트 스타일 */
-.markdown ul,
-.markdown ol {
+.markdown :deep(.copy-button) {
+  position: absolute;
+  top: 0.8em;
+  right: 0.8em;
+  background-color: #444;
+  color: white;
+  border: 1px solid #666;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  z-index: 1;
+  transition: background-color 0.2s;
+}
+
+.markdown :deep(.copy-button:hover) {
+  background-color: #555;
+}
+
+.markdown :deep(pre) {
+  background: #272822;
+  color: #f8f8f2;
+  padding: 1em;
+  padding-top: 3em;
+  overflow-x: auto;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.markdown :deep(.hljs){
+  white-space: pre-wrap;
+  margin-bottom: 10px;
+}
+
+.markdown :deep(blockquote) {
+  border-left: 4px solid #ccc;
+  padding-left: 1em;
+  color: #aaa;
+  margin: 1em 0;
+}
+
+.markdown :deep(ul),
+.markdown :deep(ol) {
   margin: 1em 0;
   padding-left: 1.5em;
 }
 
-/* 체크박스 스타일 */
-.markdown input[disabled] {
+.markdown :deep(input[disabled]) {
   margin-right: 0.5em;
 }
 
-#goList {
+/* --- [수정 및 추가된 스타일] --- */
+
+/* 우측 상단 컨트롤 버튼 컨테이너 */
+.top-right-controls {
   position: absolute;
   top: 10px;
   right: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 10;
+}
+
+/* 기존 LIST 버튼 스타일 수정 */
+#goList {
+  position: static; /* position:absolute 제거 */
   padding-block: 4px;
   padding-inline: 10px;
   border-radius: 5px;
@@ -258,5 +343,59 @@ export default {
   background: var(--main-color);
   color: white;
   font-weight: 700;
+}
+
+/* 1300px 미만일 때의 PREVIEW 버튼 */
+.preview-btn-inline {
+  padding: 4px 10px;
+  border-radius: 5px;
+  background: transparent;
+  border: 1px solid var(--main-color);
+  color: var(--main-color);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+/* 1300px 이상일 때의 고정 PREVIEW 버튼 */
+.preview-btn-fixed {
+  position: fixed;
+  top: 100px;
+  right: 60px;
+  padding: 10px 20px;
+  background: var(--main-color);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 5px;
+  z-index: 1010;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+}
+
+/* 최상단 이동 버튼 */
+.scroll-to-top-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: var(--main-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.scroll-to-top-btn:hover {
+    opacity: 1;
 }
 </style>

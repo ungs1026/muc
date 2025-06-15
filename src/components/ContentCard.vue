@@ -1,6 +1,5 @@
 <template>
   <div class="card">
-    <!-- font 폰트 프리뷰가 필요한 경우 -->
     <div v-if="item.type === 'font' && item.font_cdn" class="preview-container">
       <div
         class="font-preview"
@@ -9,14 +8,25 @@
         {{ previewText || '미리보기 텍스트' }}
       </div>
     </div>
-    <!-- 그 외는 이미지 출력 -->
     <div v-else class="card_img">
       <img :src="item.img" :alt="item.title" />
     </div>
-
+    
     <div class="info">
       <h3>{{ item.title }}</h3>
+      <hr style="width: 100%">
       <p>{{ item.sub_desc }}</p>
+      <div class="preview_wrapper">
+        <a
+          v-if="item.preview_url"
+          :href="item.preview_url"
+          class="preview-btn"
+          target="_blank"
+          @click.stop
+        >
+          Preview
+        </a>
+      </div>
     </div>
   </div>
 </template>
@@ -44,26 +54,31 @@ export default {
 
 <style scoped>
 .card {
+  height: 250px; /* 버튼 공간 확보를 위해 높이 조정 */
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: #fafafa;
+  background: #000;
+  border: 1px solid var(--main-color);
   border-radius: 8px;
+  color: white;
   padding: 16px;
   cursor: pointer;
   transition: box-shadow .2s;
 }
 .card:hover {
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(150, 167, 255, 0.2); /* 호버 효과 개선 */
 }
 .card .card_img {
   width: 100%;
-  height: 100%;
+  height: 114px; /* 높이 고정 */
   display: flex;
+  justify-content: center;
+  align-items: center;
   background: #000;
+  margin-bottom: 12px;
 }
-
 .card .card_img img {
   width: 100%;
   height: 100%;
@@ -84,18 +99,46 @@ export default {
 }
 .font-preview {
   font-size: 20px;
+  text-align: center;
 }
 .info {
   text-align: center;
   margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .info h3 {
   margin: 0;
   font-size: 18px;
 }
 .info p {
+  height: 50px;
   margin: 4px 0 0;
-  color: #666;
   font-size: 14px;
+  overflow: auto;
+  width: 100%;
+}
+.preview_wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.preview_wrapper .preview-btn {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 12px;
+  background-color: var(--main-color);
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+.preview_wrapper .preview-btn:hover {
+  background-color: #7a8eda; /* 호버 시 색상 변경 */
+  color: #fff;
 }
 </style>

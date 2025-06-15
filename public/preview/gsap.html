@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSAP 기능 정리 및 예제 프리뷰</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            padding-top: 100px;
+            padding-bottom: 20px;
+        }
+        h1, h2, h3, h4 {
+            color: #ffffff;
+            padding-bottom: 10px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #86c53f; /* GSAP Green */
+        }
+        h2 {
+            font-size: 2.5em;
+            margin-top: 60px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #555;
+        }
+        h3 {
+            margin-top: 40px;
+            border-bottom: 1px solid #96A7FF;
+            font-size: 1.8em;
+        }
+        h4 {
+            font-size: 1.2em;
+            color: #ccc;
+            border-bottom: none;
+        }
+        p { line-height: 1.6; }
+        hr { border: 0; height: 1px; background: #96A7FF; margin: 60px 0; }
+        nav {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background-color: #1a1a1a;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(134, 197, 63, 0.2);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            left: 0;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: bold;
+        }
+        nav a:hover { background-color: #86c53f; color: #000; }
+        #content_wrapper { padding-inline: 20px; max-width: 1200px; margin: 0 auto; }
+        .feature-section {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+        .preview-box {
+            position: relative;
+            background-color: #2d2d2d;
+            border: 1px solid #96A7FF;
+            border-radius: 5px;
+            min-height: 150px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .box { width: 80px; height: 80px; background-color: #96A7FF; border-radius: 8px; }
+        .controls { margin-bottom: 20px; }
+        .btn {
+            background-color: #86c53f;
+            color: #000;
+            font-weight: bold; border: none; padding: 10px 15px;
+            margin-right: 10px; border-radius: 5px; cursor: pointer;
+            font-size: 14px; transition: background-color 0.3s;
+        }
+        .btn:hover { background-color: #6a9c32; }
+        .btn.reset-btn { background-color: #e74c3c; color: #fff; }
+        .btn.reset-btn:hover { background-color: #c0392b; }
+        .btn.pause-btn { background-color: #f39c12; color: #fff; }
+        .btn.pause-btn:hover { background-color: #d35400; }
+        pre { background-color: #111; color: #f8f8f2; padding: 20px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; font-size: 14px; white-space: pre-wrap; border: 1px solid #444;}
+        .scroll-section { height: 300px; padding: 50px 0; }
+        .flip-container { display: flex; gap: 10px; }
+        .flip-container.grid-layout { display: grid; grid-template-columns: repeat(3, 1fr); }
+        .flip-box { width: 60px; height: 60px; background-color: #96A7FF; border-radius: 5px; }
+        .progress-bar {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; margin-top: 15px; height: 8px;
+            background: #444; outline: none; opacity: 0.7;
+            transition: opacity .2s; border-radius: 5px;
+        }
+        .progress-bar:hover { opacity: 1; }
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; background: #86c53f;
+            cursor: pointer; border-radius: 50%;
+        }
+        .progress-bar::-moz-range-thumb {
+            width: 20px; height: 20px; background: #86c53f;
+            cursor: pointer; border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#core">Core</a>
+        <a href="#scrolltrigger">ScrollTrigger</a>
+        <a href="#svg">SVG</a>
+        <a href="#ui">UI</a>
+        <a href="#text">Text</a>
+    </nav>
+    <div id="content_wrapper">
+
+        <h1>GSAP 기능 정리 및 예제 프리뷰</h1>
+
+        <h2 id="core">Core API</h2>
+        <div class="feature-section">
+            <h3>gsap.to()</h3>
+            <div class="preview-box"><div class="box to-box"></div></div>
+            <div class="controls"><button class="btn" onclick="toAnim.play()">Play</button><button class="btn pause-btn" onclick="toAnim.pause()">Pause</button><button class="btn reset-btn" onclick="toAnim.restart()">Reset</button></div>
+            <pre><code>const toAnim = gsap.to(".to-box", { x: 200, rotation: 360, duration: 1, paused: true });</code></pre>
+        </div>
+        <div class="feature-section">
+            <h3>gsap.from()</h3>
+            <div class="preview-box"><div class="box from-box"></div></div>
+            <div class="controls"><button class="btn" onclick="fromAnim.play()">Play</button><button class="btn pause-btn" onclick="fromAnim.pause()">Pause</button><button class="btn reset-btn" onclick="fromAnim.restart()">Reset</button></div>
+            <pre><code>const fromAnim = gsap.from(".from-box", { x: 200, opacity: 0, duration: 1, paused: true });</code></pre>
+        </div>
+        <div class="feature-section">
+            <h3>gsap.fromTo()</h3>
+            <div class="preview-box"><div class="box fromTo-box"></div></div>
+            <div class="controls"><button class="btn" onclick="fromToAnim.play()">Play</button><button class="btn pause-btn" onclick="fromToAnim.pause()">Pause</button><button class="btn reset-btn" onclick="fromToAnim.restart()">Reset</button></div>
+            <pre><code>const fromToAnim = gsap.fromTo(".fromTo-box", {x: -200, opacity: 0}, {x: 200, opacity: 1, rotation: 360, duration: 2, paused: true});</code></pre>
+        </div>
+        <div class="feature-section">
+            <h3>gsap.timeline() & Stagger</h3>
+            <div class="preview-box">
+                <div class="box timeline-box"></div><div class="box timeline-box"></div><div class="box timeline-box"></div>
+            </div>
+            <div class="controls"><button class="btn" onclick="timelineAnim.play()">Play</button><button class="btn pause-btn" onclick="timelineAnim.pause()">Pause</button><button class="btn reset-btn" onclick="timelineAnim.restart()">Reset</button></div>
+            <pre><code>const timelineAnim = gsap.timeline({ paused: true, repeat: -1, yoyo: true });
+timelineAnim.to(".timeline-box", {
+    y: 50,
+    rotation: 90,
+    scale: 1.2,
+    stagger: 0.2, // 0.2초 간격으로 순차 실행
+    duration: 0.5
+});</code></pre>
+        </div>
+        <div class="feature-section">
+            <h3>gsap.timeline() & Progress Bar</h3>
+            <div class="preview-box" style="flex-direction: column; align-items: flex-start; gap: 10px; height: 250px;">
+                <div class="box progress-box-1"></div>
+                <div class="box progress-box-2" style="background-color: tomato;"></div>
+                <div class="box progress-box-3" style="background-color: dodgerblue;"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" onclick="progressTimeline.play()">Play</button>
+                <button class="btn pause-btn" onclick="progressTimeline.pause()">Pause</button>
+                <button class="btn reset-btn" onclick="progressTimeline.restart()">Reset</button>
+            </div>
+            <input type="range" id="gsap-progress" class="progress-bar" value="0" min="0" max="100" step="0.1">
+            <pre><code>const progressTimeline = gsap.timeline({
+    paused: true,
+    onUpdate: () => {
+        // 타임라인의 진행률(0~1)을 프로그레스 바(0~100) 값에 반영
+        gsapProgressBar.value = progressTimeline.progress() * 100;
+    }
+});
+
+progressTimeline
+    .to(".progress-box-1", { xPercent: 300, rotation: 360, duration: 1 })
+    .to(".progress-box-2", { xPercent: 300, scale: 0.5, duration: 1 }, "-=0.5")
+    .to(".progress-box-3", { xPercent: 300, y: -50, duration: 1 }, "<");
+
+// 프로그레스 바를 드래그하여 애니메이션 제어
+gsapProgressBar.addEventListener('input', () => {
+    progressTimeline.progress(gsapProgressBar.value / 100).pause();
+});</code></pre>
+        </div>
+
+        <h2 id="scrolltrigger">ScrollTrigger Plugin</h2>
+        <div class="feature-section">
+            <h3>뷰포트 진입 시 애니메이션 (Toggle Actions)</h3>
+            <p>스크롤 자체가 컨트롤이므로 별도의 제어 버튼이 없습니다. 아래로 스크롤하여 박스를 확인하세요.</p>
+            <div class="scroll-section"><div class="box trigger-box"></div></div>
+            <pre><code>gsap.from(".trigger-box", {
+    scrollTrigger: {
+        trigger: ".trigger-box",
+        start: "top 80%",
+        toggleActions: "play none none reverse",
+        markers: true
+    },
+    x: -200, opacity: 0, duration: 1
+});</code></pre>
+        </div>
+        <div class="feature-section">
+            <h3>스크롤 연동 애니메이션 (Scrub)</h3>
+            <p>스크롤바의 움직임에 따라 애니메이션이 제어됩니다.</p>
+            <div class="scroll-section"><div class="box scrub-box"></div></div>
+            <pre><code>gsap.to(".scrub-box", {
+    scrollTrigger: {
+        trigger: ".scrub-box",
+        start: "top center",
+        end: "top top",
+        scrub: 1, // 1초의 지연시간을 두고 부드럽게 따라옴
+        markers: true
+    },
+    x: 300, rotation: 360
+});</code></pre>
+        </div>
+        <div class="feature-section">
+            <h3>요소 고정 (Pinning)</h3>
+            <p>스크롤하는 동안 특정 요소가 화면에 고정됩니다.</p>
+            <div class="scroll-section"><div class="box pin-box">PIN ME</div></div>
+            <pre><code>gsap.to(".pin-box", {
+    scrollTrigger: {
+        trigger: ".pin-box",
+        start: "top top",
+        end: "+=300", // 300px 스크롤하는 동안 고정
+        pin: true,
+        markers: true
+    },
+    scale: 2, ease: "none"
+});</code></pre>
+        </div>
+
+        <h2 id="svg">SVG Animation</h2>
+        <div class="feature-section">
+            <h3>SVG 속성 & 변형 애니메이션</h3>
+            <div class="preview-box">
+                <svg width="200" height="120" viewbox="0 0 200 120">
+                    <rect class="svg-attr-box" x="10" y="10" width="100" height="100" fill="#96A7FF" />
+                </svg>
+            </div>
+            <div class="controls"><button class="btn" onclick="svgAttrAnim.play()">Play</button><button class="btn pause-btn" onclick="svgAttrAnim.pause()">Pause</button><button class="btn reset-btn" onclick="svgAttrAnim.restart()">Reset</button></div>
+            <pre><code>const svgAttrAnim = gsap.to(".svg-attr-box", {
+    x: 100,
+    rotation: 45,
+    transformOrigin: "center center",
+    fill: "#86c53f",
+    duration: 1,
+    paused: true
+});</code></pre>
+        </div>
+         <div class="feature-section">
+            <h3>MotionPathPlugin</h3>
+            <div class="preview-box">
+                <svg width="300" height="150" viewbox="0 0 300 150">
+                    <path id="path1" d="M20,75 C 80,150 220,-20 280,75" stroke="#444" fill="none"/>
+                    <circle class="motion-ball" r="10" fill="#86c53f"/>
+                </svg>
+            </div>
+            <div class="controls"><button class="btn" onclick="motionPathAnim.play()">Play</button><button class="btn pause-btn" onclick="motionPathAnim.pause()">Pause</button><button class="btn reset-btn" onclick="motionPathAnim.restart()">Reset</button></div>
+            <pre><code>const motionPathAnim = gsap.to(".motion-ball", {
+    motionPath: { path: "#path1", align: "#path1", autoRotate: true, alignOrigin: [0.5, 0.5] },
+    duration: 3, ease: "power1.inOut", paused: true
+});</code></pre>
+        </div>
+
+        <h2 id="ui">UI Animation (Flip)</h2>
+        <div class="feature-section">
+            <h3>Flip Plugin</h3>
+            <p>버튼을 클릭하여 박스들의 레이아웃을 변경하면, Flip 플러그인이 부드러운 전환 애니메이션을 생성합니다.</p>
+            <div class="preview-box">
+                <div class="flip-container">
+                    <div class="flip-box"></div><div class="flip-box"></div><div class="flip-box"></div><div class="flip-box"></div>
+                </div>
+            </div>
+            <div class="controls"><button class="btn" onclick="toggleFlipLayout()">Toggle Layout</button></div>
+            <pre><code>const flipContainer = document.querySelector(".flip-container");
+const flipItems = gsap.utils.toArray(".flip-box");
+
+function toggleFlipLayout() {
+    const state = Flip.getState(flipItems);
+    flipContainer.classList.toggle("grid-layout");
+    Flip.from(state, { duration: 0.5, ease: "power1.inOut", stagger: 0.1 });
+}</code></pre>
+        </div>
+        
+        <h2 id="text">Text Animation (TextPlugin)</h2>
+        <div class="feature-section">
+            <h3>TextPlugin</h3>
+            <div class="preview-box" style="min-height: 80px;"><h4 id="text-target" style="font-family: monospace;"></h4></div>
+            <div class="controls"><button class="btn" onclick="textAnim.play()">Play</button><button class="btn pause-btn" onclick="textAnim.pause()">Pause</button><button class="btn reset-btn" onclick="textAnim.restart()">Reset</button></div>
+            <pre><code>const textAnim = gsap.to("#text-target", {
+    duration: 4,
+    text: "This text is animated by GSAP's TextPlugin!",
+    ease: "none",
+    paused: true
+});</code></pre>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/TextPlugin.min.js"></script>
+    
+    <script>
+        // --- 전역 변수 선언 ---
+        let toAnim, fromAnim, fromToAnim, timelineAnim, svgAttrAnim, motionPathAnim, textAnim, progressTimeline;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 플러그인 등록 ---
+            gsap.registerPlugin(ScrollTrigger, MotionPathPlugin, Flip, TextPlugin);
+
+            // --- Core API 초기화 ---
+            toAnim = gsap.to(".to-box", { xPercent: 200, rotation: 360, duration: 1, paused: true });
+            fromAnim = gsap.from(".from-box", { xPercent: 200, opacity: 0, duration: 1, paused: true });
+            fromToAnim = gsap.fromTo(".fromTo-box", { xPercent: -200, opacity: 0 }, { xPercent: 200, opacity: 1, rotation: 360, duration: 2, paused: true });
+            
+            timelineAnim = gsap.timeline({ paused: true, repeat: -1, yoyo: true });
+            timelineAnim.to(".timeline-box", { y: 50, rotation: 90, scale: 1.2, stagger: 0.2, duration: 0.5 });
+            
+            // [추가] Progress Bar 타임라인 초기화
+            const gsapProgressBar = document.querySelector('#gsap-progress');
+            progressTimeline = gsap.timeline({
+                paused: true,
+                onUpdate: () => {
+                    gsapProgressBar.value = progressTimeline.progress() * 100;
+                }
+            });
+            progressTimeline
+                .to(".progress-box-1", { xPercent: 250, rotation: 360, duration: 1 })
+                .to(".progress-box-2", { xPercent: 250, scale: 0.5, duration: 1 }, "-=0.5")
+                .to(".progress-box-3", { xPercent: 250, y: -50, duration: 1 }, "<");
+
+            gsapProgressBar.addEventListener('input', () => {
+                progressTimeline.progress(gsapProgressBar.value / 100).pause();
+            });
+
+            // --- ScrollTrigger 초기화 ---
+            gsap.from(".trigger-box", { scrollTrigger: { trigger: ".trigger-box", start: "top 80%", toggleActions: "play none none reverse" }, x: -200, opacity: 0, duration: 1 });
+            gsap.to(".scrub-box", { scrollTrigger: { trigger: ".scrub-box", start: "top center", end: "top top", scrub: 1 }, x: 300, rotation: 360 });
+            gsap.to(".pin-box", { scrollTrigger: { trigger: ".pin-box", start: "top top", end: "+=300", pin: true }, scale: 2, ease: "none" });
+            
+            // --- SVG 초기화 ---
+            svgAttrAnim = gsap.to(".svg-attr-box", { x: 90, rotation: 180, transformOrigin: "center center", fill: "#86c53f", duration: 1, paused: true, repeat: -1, yoyo: true });
+            motionPathAnim = gsap.to(".motion-ball", { motionPath: { path: "#path1", align: "#path1", autoRotate: true, alignOrigin: [0.5, 0.5] }, duration: 3, ease: "power1.inOut", paused: true, repeat: -1, yoyo: true });
+
+            // --- UI (Flip) ---
+            // Flip은 이벤트 기반이므로 제어 함수는 HTML에 직접 연결
+            
+            // --- Text (TextPlugin) ---
+            textAnim = gsap.to("#text-target", { duration: 4, text: "This text is animated by GSAP's TextPlugin!", ease: "none", paused: true });
+        });
+
+        // --- UI (Flip) 제어 함수 ---
+        const flipContainer = document.querySelector(".flip-container");
+        const flipItems = gsap.utils.toArray(".flip-box");
+        function toggleFlipLayout() {
+            const state = Flip.getState(flipItems);
+            flipContainer.classList.toggle("grid-layout");
+            Flip.from(state, { duration: 0.5, ease: "power1.inOut", stagger: 0.1 });
+        }
+    </script>
+</body>
+</html>

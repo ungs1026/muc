@@ -1,0 +1,28 @@
+1.  **GSAP Core (핵심 기능)**
+    * **개념**: 트윈(Tween), 타임라인(Timeline), 타겟(Targets), 변수 객체(Vars Object)
+    * **메서드**:
+        * `gsap.to()`: 현재 상태에서 지정된 상태로 애니메이션
+        * `gsap.from()`: 지정된 상태에서 현재 상태로 애니메이션
+        * `gsap.fromTo()`: 시작과 끝 상태를 모두 명시하여 애니메이션
+        * `gsap.set()`: 애니메이션 없이 즉시 속성 설정
+        * `gsap.timeline()`: 애니메이션 시퀀스를 만들기 위한 타임라인 생성 및 위치 파라미터(`+=`, `-=`, `<` 등) 사용법
+    * **전역 컨트롤**: `killTweensOf()`, `getProperty()`, `defaults()`, `utils`
+    * **주요 파라미터**: `duration`, `delay`, `ease`, `repeat`, `yoyo`, `stagger`, 콜백 함수(`onComplete` 등)
+
+2.  **ScrollTrigger (스크롤 기능)**
+    * **개념**: 스크롤 위치에 따라 애니메이션을 제어하는 플러그인
+    * **주요 속성**: `trigger`, `start`, `end`, `scrub`, `pin`, `toggleActions`, `markers` (디버깅용)
+    * **사용 패턴**: 뷰포트 진입 시 애니메이션, 패럴랙스 효과, 요소 고정(Pinning)
+
+3.  **SVG (SVG 기능)**
+    * **기본**: SVG 요소의 속성(`x`, `y`, `fill` 등)과 `transformOrigin`을 사용한 변형 애니메이션
+    * **MotionPathPlugin**: SVG `path`를 따라 요소를 움직이게 하는 기능
+    * **DrawSVGPlugin**: 선이 그려지는 듯한 드로잉 효과 (프리미엄 기능)
+
+4.  **UI (UI 기능)**
+    * **Draggable**: 드래그, 드롭, 던지기(inertia) 등 상호작용 구현 (프리미엄 기능)
+    * **Flip**: 요소의 상태 변화(레이아웃, 위치 변경 등)를 부드럽게 전환하는 FLIP (First, Last, Invert, Play) 기법
+
+5.  **Text (텍스트 기능)**
+    * **TextPlugin**: 타자기처럼 글자가 타이핑되는 효과 구현 (`value`, `speed`, `delimiter` 등 옵션 포함)
+    * **ScrambleTextPlugin**: 텍스트가 무작위로 뒤섞이다가 나타나는 효과 (프리미엄 기능)

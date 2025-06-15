@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typed.js 기능 정리 및 예제 프리뷰</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #000000;
+            color: #ffffff;
+            margin: 0;
+            padding-top: 80px;
+            padding-bottom: 20px;
+        }
+
+        h1, h2, h3 {
+            color: #ffffff;
+            padding-bottom: 10px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #96A7FF;
+        }
+
+        h2 {
+            margin-top: 40px;
+            border-bottom: 1px solid #96A7FF;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: #96A7FF;
+            margin: 60px 0;
+        }
+
+        nav {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background-color: #1a1a1a;
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(150, 167, 255, 0.2);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            left: 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: #96A7FF;
+            color: #000;
+        }
+        
+        #content_wrapper {
+					max-width: 1200px;
+					margin: 0 auto;
+          padding-inline: 20px;
+        }
+
+        .feature-section {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .preview-box {
+            position: relative;
+            background-color: #2d2d2d;
+            border: 1px solid #96A7FF;
+            border-radius: 5px;
+            min-height: 150px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #96A7FF;
+            color: #000;
+            font-weight: bold;
+            border: none;
+            padding: 10px 15px;
+            margin-right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #7a8eda;
+        }
+        
+        .btn.reset-btn {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        .btn.reset-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .btn.pause-btn {
+            background-color: #f39c12;
+            color: #fff;
+        }
+        .btn.pause-btn:hover {
+            background-color: #d35400;
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        
+        .typed-text-container {
+            font-size: 1.8em;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="#basic-usage">기본 사용법</a>
+        <a href="#speed-delay">속도 & 딜레이</a>
+        <a href="#loop-options">반복 옵션</a>
+        <a href="#cursor-backspace">커서 & 백스페이스</a>
+        <a href="#controls">컨트롤 메서드</a>
+    </nav>
+    <div id="content_wrapper">
+        <h1>Typed.js 기능 정리 및 예제 프리뷰</h1>
+
+        <div id="basic-usage" class="feature-section">
+            <h2>기본 사용법 (Basic Usage)</h2>
+            <p>가장 기본적인 형태로, `strings` 배열에 담긴 문자열을 순서대로 타이핑합니다.</p>
+            <div class="preview-box">
+                <div class="typed-text-container">
+                    <span id="typed-basic"></span>
+                </div>
+            </div>
+            <pre><code>const options = {
+    strings: [
+        'First sentence.', 
+        'Second sentence.',
+        '안녕하세요, Typed.js 입니다.'
+    ],
+    typeSpeed: 50,
+};
+
+const typed = new Typed('#typed-basic', options);</code></pre>
+        </div>
+
+        <hr>
+
+        <div id="speed-delay" class="feature-section">
+            <h2>속도 & 딜레이 옵션 (Speed & Delay)</h2>
+            <p>`typeSpeed`, `backSpeed`, `startDelay`, `backDelay` 옵션을 통해 타이핑, 삭제, 시작, 재시작 시의 속도와 지연 시간을 제어할 수 있습니다.</p>
+            <div class="preview-box">
+                <div class="typed-text-container">
+                    <span id="typed-speed"></span>
+                </div>
+            </div>
+            <pre><code>new Typed('#typed-speed', {
+    strings: ['Typing slowly...', 'Deleting slowly...', 'And starting again after a delay.'],
+    typeSpeed: 100,      // 타이핑 속도 (느리게)
+    backSpeed: 100,      // 삭제 속도 (느리게)
+    startDelay: 1000,    // 시작 전 딜레이
+    backDelay: 2000,     // 삭제 후 딜레이
+    loop: true
+});</code></pre>
+        </div>
+
+        <hr>
+
+        <div id="loop-options" class="feature-section">
+            <h2>반복 옵션 (Loop)</h2>
+            <p>`loop: true`로 무한 반복을 설정하거나, `loopCount`를 지정하여 특정 횟수만큼만 반복시킬 수 있습니다. (아래 예제는 3회 반복)</p>
+            <div class="preview-box">
+                <div class="typed-text-container">
+                    <span id="typed-loop"></span>
+                </div>
+            </div>
+            <pre><code>new Typed('#typed-loop', {
+    strings: ['Looping.', 'Again.', 'One more time.'],
+    typeSpeed: 50,
+    backSpeed: 50,
+    loop: true,
+    loopCount: 3 // 3회만 반복
+});</code></pre>
+        </div>
+
+        <hr>
+
+        <div id="cursor-backspace" class="feature-section">
+            <h2>커서 & 스마트 백스페이스 (Cursor & Smart Backspace)</h2>
+            <p>`cursorChar`로 커서 모양을 바꾸거나, `smartBackspace: false`로 설정하여 공통 부분까지 모두 지우도록 만들 수 있습니다.</p>
+            <div class="preview-box" style="flex-direction: column; align-items: flex-start; gap: 20px;">
+                <div class="typed-text-container">Custom Cursor: <span id="typed-cursor"></span></div>
+                <div class="typed-text-container">Smart Backspace Off: <span id="typed-backspace"></span></div>
+            </div>
+            <pre><code>// 1. Custom Cursor
+new Typed('#typed-cursor', {
+    strings: ['Cursor is now an underscore.'],
+    typeSpeed: 50,
+    cursorChar: '_', // 커서 문자 변경
+    loop: true
+});
+
+// 2. Smart Backspace Off
+new Typed('#typed-backspace', {
+    strings: ['I am a Vue developer.', 'I am a React developer.'],
+    typeSpeed: 50,
+    smartBackspace: false, // 스마트 백스페이스 비활성화
+    loop: true
+});</code></pre>
+        </div>
+        
+        <hr>
+
+        <div id="controls" class="feature-section">
+            <h2>컨트롤 메서드 (Control Methods)</h2>
+            <p>생성된 Typed 인스턴스의 메서드를 호출하여 애니메이션을 직접 제어할 수 있습니다.</p>
+            <div class="preview-box">
+                <div class="typed-text-container">
+                    <span id="typed-control"></span>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn play-btn" onclick="playTyped()">Play</button>
+                <button class="btn pause-btn" onclick="pauseTyped()">Pause</button>
+                <button class="btn reset-btn" onclick="resetTyped()">Reset</button>
+            </div>
+            <pre><code>const controlledInstance = new Typed('#typed-control', { /* ... */ });
+
+// Play Button
+function playTyped() {
+    controlledInstance.start();
+}
+// Pause Button
+function pauseTyped() {
+    controlledInstance.stop();
+}
+// Reset Button
+function resetTyped() {
+    controlledInstance.reset();
+}</code></pre>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    
+    <script>
+        let controlledInstance; // 컨트롤 예제를 위한 전역 변수
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 1. 기본 사용법 ---
+            new Typed('#typed-basic', {
+                strings: [
+                    'First sentence.', 
+                    'Second sentence.',
+                    '안녕하세요, Typed.js 입니다.'
+                ],
+                typeSpeed: 50,
+                loop: true
+            });
+
+            // --- 2. 속도 & 딜레이 ---
+            new Typed('#typed-speed', {
+                strings: ['Typing slowly...', 'Deleting slowly...', 'And starting again after a delay.'],
+                typeSpeed: 100,
+                backSpeed: 100,
+                startDelay: 1000,
+                backDelay: 2000,
+                loop: true
+            });
+
+            // --- 3. 반복 옵션 ---
+            new Typed('#typed-loop', {
+                strings: ['Looping.', 'Again.', 'One more time.'],
+                typeSpeed: 50,
+                backSpeed: 50,
+                loop: true,
+                loopCount: 3
+            });
+
+            // --- 4. 커서 & 백스페이스 ---
+            new Typed('#typed-cursor', {
+                strings: ['Cursor is now an underscore.'],
+                typeSpeed: 50,
+                cursorChar: '_',
+                loop: true,
+                backDelay: 2000,
+            });
+            new Typed('#typed-backspace', {
+                strings: ['I am a Vue developer.', 'I am a React developer.'],
+                typeSpeed: 50,
+                smartBackspace: false, // Default is true
+                loop: true,
+                backDelay: 2000,
+            });
+
+            // --- 5. 컨트롤 메서드 ---
+            controlledInstance = new Typed('#typed-control', {
+                strings: ['You can control me.', 'Use the buttons below.', 'Try it!'],
+                typeSpeed: 50,
+                backSpeed: 30,
+                loop: true,
+            });
+        });
+
+        // 컨트롤 함수
+        function playTyped() {
+            if (controlledInstance) controlledInstance.start();
+        }
+
+        function pauseTyped() {
+            if (controlledInstance) controlledInstance.stop();
+        }
+
+        function resetTyped() {
+            if (controlledInstance) controlledInstance.reset();
+        }
+    </script>
+</body>
+</html>
