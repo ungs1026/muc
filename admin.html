@@ -4,9 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Library Admin</title>
-  <!-- Vue 3 -->
   <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.6/dist/umd/supabase.min.js"></script>
   <style>
     * { box-sizing: border-box; }
@@ -24,20 +22,61 @@
     .toolbar button { margin-right: 3px; }
     /* Modal styles */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
-    .modal { background: white;
+    .modal { 
+      background: white;
       padding: 20px;
       border-radius: 5px;
-      width: 70%;
-      max-width: 90%;
-      height: 70%;
-      max-height: 80%;
-      overflow: auto;
+      width: 80%; /* 모달 너비 조정 */
+      max-width: 1200px;
+      height: 80%;
+      max-height: 90%;
+      overflow: hidden; /* 내부 스크롤을 위해 hidden으로 변경 */
+      display: flex;
+      flex-direction: column;
     }
     .modal h2 { margin-top: 0; }
+    .modal form {
+      display: flex; /* form 자체를 flex container로 사용 */
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+    .modal .form-layout {
+      display: flex;
+      gap: 20px;
+      flex-grow: 1; /* 남은 공간을 모두 차지 */
+      overflow: hidden;
+    }
+    .modal .form-column-left,
+    .modal .form-column-right {
+      display: flex;
+      flex-direction: column;
+    }
+    .modal .form-column-left {
+      flex-basis: 40%;
+      min-width: 300px;
+      overflow-y: auto; /* 내용이 길어지면 스크롤 */
+      padding-right: 10px;
+    }
+    .modal .form-column-right {
+      flex-basis: 60%;
+      display: flex;
+      flex-direction: column;
+    }
+    /* context 입력 영역이 오른쪽 컬럼을 꽉 채우도록 설정 */
+    .modal .form-column-right > div {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .modal .form-column-right textarea {
+      flex-grow: 1; /* 사용 가능한 모든 세로 공간 차지 */
+      resize: vertical;
+    }
     .modal form div { margin-bottom: 10px; }
     .modal label { display: block; margin-bottom: 5px; }
     .modal input[type="text"], .modal textarea, .modal select { width: 100%; padding: 5px; }
-    .modal footer { text-align: right; }
+    .modal footer { text-align: right; margin-top: auto; padding-top: 10px; }
     .modal footer button { margin-left: 5px; }
     .sub_desc {
       width: 12rem;
@@ -48,6 +87,24 @@
       width: 100%;
       height: 50px;
       overflow: auto;
+    }
+    /* Preview URL 입력 그룹 스타일 */
+    .url-input-group {
+        display: flex;
+        align-items: center;
+        border: 1px solid #999;
+        border-radius: 3px;
+    }
+    .url-input-group span {
+        padding: 5px 8px;
+        background-color: #f0f0f0;
+        color: #333;
+        white-space: nowrap;
+    }
+    .url-input-group input {
+        border: none;
+        outline: none;
+        flex-grow: 1;
     }
   </style>
 </head>
@@ -62,7 +119,7 @@
     </div>
 
     <table>
-      <thead><tr><th>Idx</th><th>Type</th><th>Title</th><th>Sub Desc</th><th>Context</th><th>Font CDN</th><th>Image</th><th>Free</th><th>Actions</th></thead>
+      <thead><tr><th>Idx</th><th>Type</th><th>Title</th><th>Sub Desc</th><th>Context</th><th>Font CDN</th><th>Image</th><th>Preview URL</th><th>Free</th><th>Actions</th></tr></thead>
       <tbody>
         <tr v-for="rec in filteredRecords" :key="rec.idx">
           <td>{{ rec.idx }}</td>
@@ -72,48 +129,62 @@
           <td><div class="context">{{ rec.context }}</div></td>
           <td>{{ rec.font_cdn }}</td>
           <td><img :src="rec.img" alt="img" style="height:40px;"/></td>
+          <td><a :href="rec.preview_url" target="_blank">{{ rec.preview_url }}</a></td>
           <td><input type="checkbox" disabled :checked="rec.isFree" /></td>
           <td class="actions"><button @click="openEditModal(rec)">Edit</button><button @click="deleteRecord(rec.idx)">Delete</button></td>
         </tr>
       </tbody>
     </table>
 
-    <!-- Add/Edit Modal -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal">
         <h2>{{ isEdit ? 'Edit' : 'Add' }} Record</h2>
         <form @submit.prevent="isEdit ? updateRecord() : addRecord()">
-          <div>
-            <label>Type<select v-model="form.type" required><option v-for="t in types" :key="t" :value="t">{{ t }}</option></select></label>
-          </div>
-          <div><label>Title<input type="text" v-model="form.title" required/></label></div>
-          <div><label>Sub Desc<textarea style="height: 10rem;" v-model="form.sub_desc"></textarea></label></div>
-          <div>
-            <label>Context</label>
-            <div class="toolbar">
-              <button type="button" @click="insertMd('# ')">H1</button>
-              <button type="button" @click="insertMd('## ')">H2</button>
-              <button type="button" @click="insertMd('### ')">H3</button>
-              <button type="button" @click="insertMd('**bold**')">B</button>
-              <button type="button" @click="insertMd('*italic*')">I</button>
-              <button type="button" @click="insertMd('```\ncode\n```')">Code</button>
-              <button type="button" @click="insertMd('> ')">Quote</button>
-              <button type="button" @click="insertMd('[text](url)')">Link</button>
-              <button type="button" @click="insertMd('---')">HR</button>
-              <button type="button" @click="insertMd('| Header | |\n| ------ | --- |')">Table</button>
-              <button type="button" @click="insertMd('- [ ] ')">Task</button>
+          <div class="form-layout">
+            <div class="form-column-left">
+              <div>
+                <label>Type<select v-model="form.type" required><option v-for="t in types" :key="t" :value="t">{{ t }}</option></select></label>
+              </div>
+              <div><label>Title<input type="text" v-model="form.title" required/></label></div>
+              <div><label>Sub Desc<textarea style="height: 10rem;" v-model="form.sub_desc"></textarea></label></div>
+              <div><label>Font CDN<input type="text" v-model="form.font_cdn"/></label></div>
+              <div>
+                <label>Image File<input type="file" @change="onFileChange"/></label>
+                <div v-if="isEdit && form.img">
+                  <img :src="form.img" alt="Current Image" style="height:80px; margin-top:5px;"/>
+                </div>
+              </div>
+              <div>
+                <label>Preview URL</label>
+                <div class="url-input-group">
+                    <span>/preview/</span>
+                    <input type="text" v-model="form.preview_filename" placeholder="filename" />
+                    <span>.html</span>
+                </div>
+              </div>
+              <div><label>Free<input type="checkbox" v-model="form.isFree"/></label></div>
             </div>
-            <textarea ref="ctx" style="height: 20rem;" v-model="form.context"></textarea>
-          </div>
-          <div><label>Font CDN<input type="text" v-model="form.font_cdn"/></label></div>
-          <div>
-            <label>Image File<input type="file" @change="onFileChange"/></label>
-            <div v-if="isEdit && form.img">
-              <!-- 기존에 저장된 이미지 표시 -->
-              <img :src="form.img" alt="Current Image" style="height:80px; margin-top:5px;"/>
+
+            <div class="form-column-right">
+              <div>
+                <label>Context</label>
+                <div class="toolbar">
+                  <button type="button" @click="insertMd('# ')">H1</button>
+                  <button type="button" @click="insertMd('## ')">H2</button>
+                  <button type="button" @click="insertMd('### ')">H3</button>
+                  <button type="button" @click="insertMd('**bold**')">B</button>
+                  <button type="button" @click="insertMd('*italic*')">I</button>
+                  <button type="button" @click="insertMd('```\ncode\n```')">Code</button>
+                  <button type="button" @click="insertMd('> ')">Quote</button>
+                  <button type="button" @click="insertMd('[text](url)')">Link</button>
+                  <button type="button" @click="insertMd('---')">HR</button>
+                  <button type="button" @click="insertMd('| Header | |\n| ------ | --- |')">Table</button>
+                  <button type="button" @click="insertMd('- [ ] ')">Task</button>
+                </div>
+                <textarea ref="ctx" v-model="form.context"></textarea>
+              </div>
             </div>
           </div>
-          <div><label>Free<input type="checkbox" v-model="form.isFree"/></label></div>
           <footer>
             <button type="button" @click="closeModal">Cancel</button>
             <button type="submit">{{ isEdit ? 'Update' : 'Save' }}</button>
@@ -135,7 +206,7 @@
         return {
           records: [], types: ['library','api','css','font','js','gsap'],
           selectedType: null, showModal: false, isEdit: false,
-          form: { type:'', title:'', sub_desc:'', context:'', font_cdn:'', img:'', isFree:false },
+          form: { type:'', title:'', sub_desc:'', context:'', font_cdn:'', img:'', preview_url:'', preview_filename:'', isFree:true },
           file: null, editId: null
         };
       },
@@ -154,7 +225,9 @@
           this.resetForm(); this.isEdit=false; this.showModal=true;
         },
         openEditModal(rec) {
-          this.form = { ...rec, isFree: rec.isFree };
+          const previewUrl = rec.preview_url || '';
+          const filename = previewUrl.replace('/src/preview/', '').replace('.html', '');
+          this.form = { ...rec, isFree: rec.isFree, preview_filename: filename };
           this.file = null;
           this.editId = rec.idx;
           this.isEdit = true;
@@ -184,16 +257,19 @@
             .getPublicUrl(filePath);
           return data.publicUrl;
         },
+        createPayload() {
+            const fullPreviewUrl = this.form.preview_filename ? `/preview/${this.form.preview_filename}.html` : '';
+            const payload = { ...this.form, isfree: this.form.isFree, preview_url: fullPreviewUrl };
+            
+            delete payload.isFree;
+            delete payload.preview_filename; // DB에 저장하지 않을 임시 필드 삭제
+            return payload;
+        },
         async addRecord() {
           const imageUrl = await this.uploadImage();
-          const payload = {
-            ...this.form,
-            context: this.form.context,
-            sub_desc: this.form.sub_desc,
-            isfree: this.form.isFree,
-            img: imageUrl
-          };
-          delete payload.isFree;
+          const payload = this.createPayload();
+          payload.img = imageUrl;
+
           const { error } = await supabaseClient.from('library').insert([payload]);
           if(error) console.error(error);
           else { this.fetchData(); this.closeModal(); }
@@ -201,7 +277,6 @@
         async updateRecord() {
           let imageUrl = this.form.img;
           if (this.file) {
-            // 기존 파일명을 재사용하여 덮어쓰기
             const urlObj = new URL(this.form.img);
             const segments = urlObj.pathname.split('/');
             const existingFileName = segments[segments.length-1];
@@ -211,23 +286,21 @@
             const { data } = supabaseClient.storage
               .from('lib')
               .getPublicUrl(existingFileName);
-            imageUrl = data.publicUrl;
+            imageUrl = `${data.publicUrl}?t=${new Date().getTime()}`;
           }
-          const payload = {
-            ...this.form,
-            context: this.form.context,
-            sub_desc: this.form.sub_desc,
-            isfree: this.form.isFree,
-            img: imageUrl
-          };
-          delete payload.isFree;
+          const payload = this.createPayload();
+          payload.img = imageUrl;
+
           const { error } = await supabaseClient.from('library').update(payload).eq('idx',this.editId);
           if(error) console.error(error);
           else { this.fetchData(); this.closeModal(); }
         },
         async deleteRecord(id) { if(confirm('삭제하시겠습니까?')){ await supabaseClient.from('library').delete().eq('idx',id); this.fetchData(); } },
         closeModal() { this.showModal=false; },
-        resetForm() { this.form={ type:'',title:'',sub_desc:'',context:'',font_cdn:'',img:'',isFree:false }; this.file=null; }
+        resetForm() { 
+            this.form={ type:'', title:'', sub_desc:'', context:'', font_cdn:'', img:'', preview_url:'', preview_filename: '', isFree: true }; 
+            this.file=null; 
+        }
       },
       mounted() { this.fetchData(); }
     }).mount('#app');

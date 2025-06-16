@@ -1,11 +1,21 @@
 <template>
   <div class="card">
+    <a
+      v-if="item.preview_url"
+      :href="item.preview_url"
+      class="ribbon-link"
+      target="_blank"
+      @click.stop
+    >
+      preview
+    </a>
+
     <div v-if="item.type === 'font' && item.font_cdn" class="preview-container">
       <div
         class="font-preview"
-        :style="{ fontFamily: item.title }"
+        :style="fontPreviewStyle"
       >
-        {{ previewText || '미리보기 텍스트' }}
+        {{ previewText || 'temp' }}
       </div>
     </div>
     <div v-else class="card_img">
@@ -17,15 +27,6 @@
       <hr style="width: 100%">
       <p>{{ item.sub_desc }}</p>
       <div class="preview_wrapper">
-        <a
-          v-if="item.preview_url"
-          :href="item.preview_url"
-          class="preview-btn"
-          target="_blank"
-          @click.stop
-        >
-          Preview
-        </a>
       </div>
     </div>
   </div>
@@ -39,10 +40,31 @@ export default {
     previewText: {
       type: String,
       default: ''
+    },
+    fontSize: {
+      type: Number,
+      default: 20
+    },
+    fontWeight: {
+      type: Number,
+      default: 400
+    },
+    textTransform: {
+      type: String,
+      default: 'none'
+    }
+  },
+  computed: {
+    fontPreviewStyle() {
+      return {
+        fontFamily: this.item.title,
+        fontSize: `${this.fontSize}px`,
+        fontWeight: this.fontWeight,
+        textTransform: this.textTransform
+      };
     }
   },
   mounted() {
-    // font 폰트가 있으면 동적으로 import
     if (this.item.type === 'font' && this.item.font_cdn) {
       const styleTag = document.createElement('style');
       styleTag.innerText = `@import url('${this.item.font_cdn}');`;
@@ -54,7 +76,7 @@ export default {
 
 <style scoped>
 .card {
-  height: 250px; /* 버튼 공간 확보를 위해 높이 조정 */
+  height: 250px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -66,13 +88,36 @@ export default {
   padding: 16px;
   cursor: pointer;
   transition: box-shadow .2s;
+  position: relative;
+  overflow: hidden; 
 }
+
+/* [수정] 텍스트 스타일 추가 */
+.ribbon-link {
+  position: absolute;
+  z-index: 1;
+  height: 2rem;
+  top: 16px;
+  right: -8.2rem;
+  transform: rotate(36deg);
+  width: 150%;
+  background: linear-gradient( 90deg, white 10%, #7a8eda 50%);
+  text-align: center;
+  line-height: 2rem;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+
 .card:hover {
-  box-shadow: 0 2px 8px rgba(150, 167, 255, 0.2); /* 호버 효과 개선 */
+  box-shadow: 0 2px 8px rgba(150, 167, 255, 0.2);
 }
 .card .card_img {
   width: 100%;
-  height: 114px; /* 높이 고정 */
+  height: 114px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -96,10 +141,11 @@ export default {
   border-radius: 4px;
   margin-bottom: 12px;
   padding: 8px;
+  overflow: hidden;
 }
 .font-preview {
-  font-size: 20px;
   text-align: center;
+  transition: font-size 0.3s, font-weight 0.3s;
 }
 .info {
   text-align: center;
@@ -107,6 +153,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 .info h3 {
   margin: 0;
@@ -124,11 +171,10 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  margin-top: auto;
 }
 
 .preview_wrapper .preview-btn {
-  display: inline-block;
-  margin-top: 8px;
   padding: 4px 12px;
   background-color: var(--main-color);
   font-weight: bold;
@@ -138,7 +184,7 @@ export default {
   transition: background-color 0.2s;
 }
 .preview_wrapper .preview-btn:hover {
-  background-color: #7a8eda; /* 호버 시 색상 변경 */
+  background-color: #7a8eda;
   color: #fff;
 }
 </style>
